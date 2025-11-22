@@ -15,5 +15,5 @@
           username="avnadmin"
           password="AVNS_sRepHIqWkt1skS2n_BJ"
           
-          url="jdbc:mysql://mysql-cbdfec6-vpn24112003-17b5.c.aivencloud.com:28168/defaultdb?sslMode=REQUIRED&amp;useUnicode=true&amp;characterEncoding=utf8"
+          url="jdbc:mysql://mysql-cbdfec6-vpn24112003-17b5.c.aivencloud.com:28168/defaultdb?sslMode=REQUIRED&amp;useUnicode=true&amp;characterEncoding=utf8"/>
 </Context>
