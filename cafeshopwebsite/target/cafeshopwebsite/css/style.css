@@ -108,7 +108,7 @@ nav a:hover {
 }
 
 .btn:hover {
-    background-color: #ff5252;
+    background-color: #c49363;
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(255,107,107,0.3);
 }
@@ -413,4 +413,194 @@ footer p {
     background-color: #d1ecf1;
     color: #0c5460;
     border: 1px solid #bee5eb;
+}
+/* --- CSS CHO BỘ LỌC (CATEGORY FILTER) --- */
+.category-filter {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+}
+
+.category-btn {
+    padding: 12px 25px;
+    border: none;
+    background-color: #f8f9fa; /* Màu nền sáng */
+    color: #555;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 50px; /* Bo tròn hoàn toàn */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    /* Hiệu ứng đổ bóng nhẹ ban đầu */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    border: 1px solid transparent;
+}
+
+/* Hiệu ứng khi di chuột vào (Hover) */
+.category-btn:hover {
+    background-color: #fff;
+    transform: translateY(-3px); /* Nổi lên trên */
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15); /* Bóng đậm hơn */
+    color: #d35400; /* Đổi màu chữ sang màu chủ đạo */
+    border-color: #d35400;
+}
+
+/* Trạng thái đang chọn (Active) */
+.category-btn.active {
+    background: linear-gradient(45deg, #d35400, #e67e22); /* Màu gradient cam */
+    color: white;
+    box-shadow: 0 4px 15px rgba(211, 84, 0, 0.4); /* Bóng màu cam */
+    transform: scale(1.05); /* Phóng to nhẹ */
+}
+
+/* Responsive cho mobile */
+@media (max-width: 768px) {
+    .category-btn {
+        padding: 10px 15px;
+        font-size: 13px;
+    }
+}
+/* =========================================
+   RESPONSIVE - TỐI ƯU CHO MOBILE & TABLET
+   ========================================= */
+
+/* --- 1. MÀN HÌNH TABLET (Chiều rộng < 992px) --- */
+@media (max-width: 992px) {
+    
+    /* Header: Logo và Menu xếp dọc */
+    header .container {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    header nav ul {
+        margin-top: 15px;
+        justify-content: center;
+        flex-wrap: wrap; /* Cho phép menu xuống dòng nếu dài */
+        gap: 10px;
+    }
+
+    /* Sản phẩm: Hiện 3 cột thay vì 4 */
+    .products-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    /* Phần Best Seller xếp tầng: Chữ nhỏ lại chút */
+    .layer-title { font-size: 32px; }
+    .layer-image img { height: 350px; }
+}
+
+/* --- 2. MÀN HÌNH MOBILE (Chiều rộng < 768px) --- */
+@media (max-width: 768px) {
+    
+    /* Container: Giảm lề để rộng chỗ hơn */
+    .container {
+        width: 95%;
+        padding: 0 10px;
+    }
+
+    /* Sản phẩm: Hiện 2 cột (hoặc 1 cột nếu muốn to) */
+    .products-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+    
+    /* Banner Hero */
+    .hero h2 { font-size: 28px; }
+    .hero p { font-size: 16px; }
+
+    /* --- BEST SELLER (XẾP TẦNG) --- */
+    /* Ép buộc xếp dọc (Ảnh trên, chữ dưới) và ghi đè style inline */
+    .layer-item {
+        flex-direction: column !important; /* Dùng !important để đè style inline trong JSP */
+        gap: 20px !important;
+        margin-bottom: 60px !important;
+        text-align: center !important;
+    }
+    
+    .layer-content {
+        text-align: center !important; /* Canh giữa nội dung */
+        padding: 0 10px;
+    }
+    
+    .layer-image img {
+        height: 250px; /* Ảnh nhỏ lại cho vừa mobile */
+    }
+    
+    /* Badge Top 1,2,3 căn giữa */
+    .rank-badge {
+        left: 50% !important;
+        right: auto !important;
+        transform: translateX(-50%);
+    }
+
+    /* --- TRANG THANH TOÁN & GIỎ HÀNG --- */
+    /* Chuyển layout 2 cột thành 1 cột dọc */
+    .cart-section .container > div {
+        grid-template-columns: 1fr !important;
+    }
+    
+    /* Ẩn bớt các cột không quan trọng trong bảng giỏ hàng */
+    .cart-table th:nth-child(2), /* Đơn giá */
+    .cart-table td:nth-child(2) {
+        display: none;
+    }
+    
+    /* Nút số lượng to hơn để dễ bấm */
+    .qty-btn {
+        width: 35px;
+        height: 35px;
+    }
+
+    /* --- TRANG ADMIN --- */
+    /* Sidebar admin biến thành menu ngang ở trên hoặc xếp dọc */
+    body {
+        flex-direction: column; /* Body Admin chuyển thành dọc */
+    }
+    .admin-sidebar {
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .stats-grid {
+        grid-template-columns: 1fr; /* Thẻ thống kê xếp dọc */
+    }
+    .charts-wrapper {
+        grid-template-columns: 1fr; /* Biểu đồ xếp dọc */
+    }
+}
+
+/* --- 3. MÀN HÌNH ĐIỆN THOẠI NHỎ (Chiều rộng < 480px) --- */
+@media (max-width: 480px) {
+    /* Sản phẩm: 1 cột duy nhất cho to rõ */
+    .products-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Header Menu: Xếp dọc từng món */
+    header nav ul {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    /* Các nút bấm to ra full màn hình */
+    .btn, .btn-secondary {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    /* Ẩn luôn cột hình ảnh trong giỏ hàng nếu quá chật (tùy chọn) */
+    .cart-table img {
+        width: 40px; height: 40px;
+    }
+}
+/* Tạo thanh cuộn ngang cho bảng khi màn hình nhỏ */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto; /* Cho phép cuộn ngang */
+    -webkit-overflow-scrolling: touch; /* Cuộn mượt trên iOS */
+    margin-bottom: 15px;
+    border: 1px solid #eee;
 }

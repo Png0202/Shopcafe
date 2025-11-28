@@ -9,9 +9,17 @@ public class Order {
     private String address;
     private double totalPrice;
     private String status;
+    private String note;
+    private String paymentMethod;
 
     // Constructor không tham số
     public Order() {}
+
+    // Getter/Setter cho Note và PaymentMethod
+    public String getNote() { return note; }
+    public void setNote(String note) { this.note = note; }
+    public String getPaymentMethod() { return paymentMethod; }
+    public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
 
     // Constructor đầy đủ
     public Order(int id, String userEmail, Timestamp orderDate, String address, double totalPrice, String status) {

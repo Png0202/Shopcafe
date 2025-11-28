@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
 
 <%-- LOGIC XÁC ĐỊNH TAB NÀO SẼ ĐƯỢC ACTIVE KHI TẢI TRANG --%>
 <c:set var="activeTab" value="login" />
@@ -35,6 +35,81 @@
             color: #155724;
             border: 1px solid #c3e6cb;
         }
+        /* --- CSS CHECKBOX TÙY CHỈNH ĐẸP HƠN --- */
+        
+        /* 1. Ẩn checkbox mặc định xấu xí của trình duyệt */
+        .form-group.remember input[type="checkbox"],
+        .form-group.terms input[type="checkbox"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+        /* 2. Thiết lập vị trí cho Label */
+        .form-group.remember label,
+        .form-group.terms label {
+            position: relative;
+            padding-left: 24px; /* Chừa chỗ cho ô vuông */
+            cursor: pointer;
+            user-select: none; /* Không cho bôi đen text khi click */
+            font-size: 14px;
+            color: #555;
+            display: inline-block;
+            line-height: 22px; /* Căn giữa theo chiều dọc */
+        }
+
+        /* 3. Vẽ ô vuông (Checkbox giả) */
+        .form-group.remember label::before,
+        .form-group.terms label::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 1px;
+            height: 16px;
+            width: 16px;
+            background-color: #fff;
+            border: 2px solid #d35400; /* Viền màu cam chủ đạo */
+            border-radius: 4px; /* Bo góc nhẹ */
+            transition: all 0.3s ease;
+        }
+
+        /* 4. Vẽ dấu tích (Checkmark) bên trong */
+        .form-group.remember label::after,
+        .form-group.terms label::after {
+            content: "";
+            position: absolute;
+            left: 5px;
+            top: 5px;
+            width: 4px;
+            height: 9px;
+            border: solid white;
+            border-width: 0 2px 2px 0; /* Tạo hình chữ L */
+            transform: rotate(45deg); /* Xoay thành dấu tích */
+            opacity: 0; /* Mặc định ẩn đi */
+            transition: all 0.2s ease;
+        }
+
+        /* 5. Hiệu ứng khi Hover (Di chuột vào) */
+        .form-group.remember:hover label::before,
+        .form-group.terms:hover label::before {
+            background-color: #fdf2e9; /* Màu nền cam nhạt */
+        }
+
+        /* 6. Trạng thái ĐÃ CHỌN (Checked) */
+        /* Khi input được check, đổi màu ô vuông */
+        .form-group.remember input:checked ~ label::before,
+        .form-group.terms input:checked ~ label::before {
+            background-color: #d35400;
+            border-color: #d35400;
+        }
+
+        /* Khi input được check, hiện dấu tích */
+        .form-group.remember input:checked ~ label::after,
+        .form-group.terms input:checked ~ label::after {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -44,7 +119,7 @@
             <nav>
                 <ul>
                     <%-- 1. MENU CÔNG KHAI (Ai cũng thấy) --%>
-                    <li><a href="${pageContext.request.contextPath}/index.jsp">Trang Chủ</a></li>
+                    <li><a href="${pageContext.request.contextPath}/home">Trang Chủ</a></li>
                     
                     <%-- Lưu ý: Ở file menu.jsp thì thêm class="active" vào dòng này --%>
                     <li><a href="${pageContext.request.contextPath}/menu">Thực Đơn</a></li>
@@ -180,9 +255,11 @@
         </div>
     </section>
 
+    <%-- FOOTER --%>
     <footer>
         <div class="container">
-            <p>&copy; 2025 Quán Cà Phê Vĩnh Long</p>
+            <p>&copy; 2025 Quán Cà Phê Vĩnh Long. Đồ án môn học Công Nghệ Thông Tin 1.</p>
+            <p>Sinh viên thực hiện: Phan Tuấn Cảnh - Võ Phúc Nguyên</p>
         </div>
     </footer>
 

@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
+<%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -55,7 +55,7 @@
             <h1>☕ Quán Cà Phê Vĩnh Long</h1>
             <nav>
                 <ul>
-                    <li><a href="${pageContext.request.contextPath}/index.jsp">Trang Chủ</a></li>
+                    <li><a href="${pageContext.request.contextPath}/home">Trang Chủ</a></li>
                     <li><a href="${pageContext.request.contextPath}/menu">Thực Đơn</a></li>
                     <li><a href="${pageContext.request.contextPath}/cart">Giỏ Hàng</a></li>
                     <c:choose>
@@ -201,7 +201,7 @@
                         
                         <div style="margin-top: 1.5rem;">
                             <%-- Nút Submit nằm ngoài form nhưng có attribute form="checkoutForm" để liên kết --%>
-                            <button type="submit" form="checkoutForm" class="btn" style="width: 100%; padding: 1rem;" onclick="return confirm('Xác nhận đặt hàng?');">Xác Nhận Đặt Hàng</button>
+                            <button type="submit" form="checkoutForm" class="btn" style="width: 100%; padding: 1rem; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;" onclick="return confirm('Xác nhận đặt hàng?');">Xác Nhận Đặt Hàng</button>
                         </div>
                     </div>
                 </div>

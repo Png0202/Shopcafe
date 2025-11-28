@@ -76,6 +76,8 @@ public class ProfileServlet extends HttpServlet {
                     order.setAddress(rsOrder.getString("address"));
                     order.setTotalPrice(rsOrder.getDouble("total_money"));
                     order.setStatus(rsOrder.getString("status"));
+                    order.setNote(rsOrder.getString("note"));
+                    order.setPaymentMethod(rsOrder.getString("payment_method"));
                     orderList.add(order);
                 }
             }
@@ -98,8 +100,6 @@ public class ProfileServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.setCharacterEncoding("UTF-8");
-        response.setCharacterEncoding("UTF-8");
         HttpSession session = request.getSession();
         String email = (String) session.getAttribute("userEmail");
         String action = request.getParameter("action");

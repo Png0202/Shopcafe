@@ -6,6 +6,6 @@
 <body>
     <h1>404 - Page Not Found</h1>
     <p>Xin lỗi, trang bạn yêu cầu không tồn tại.</p>
-    <a href="<%= request.getContextPath() %>/index.jsp">Quay về Trang Chủ</a>
+    <a href="<%= request.getContextPath() %>/home">Quay về Trang Chủ</a>
 </body>
 </html>

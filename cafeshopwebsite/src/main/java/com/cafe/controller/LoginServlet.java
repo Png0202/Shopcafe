@@ -5,6 +5,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+import com.cafe.util.DBConnection;
+import com.cafe.util.PasswordUtil; 
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -12,17 +15,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.cafe.util.DBConnection;
-import com.cafe.util.PasswordUtil;
-
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
-        request.setCharacterEncoding("UTF-8");
-        response.setCharacterEncoding("UTF-8");        
+            throws ServletException, IOException {
 
         String email = request.getParameter("email");
         String password = request.getParameter("password"); 
@@ -40,18 +38,29 @@ public class LoginServlet extends HttpServlet {
 
             if (rs.next()) {
                 String hashedPasswordFromDB = rs.getString("password");
-                // Kiểm tra mật khẩu
+                int permission = rs.getInt("permissions"); // Lấy quyền
+
                 if (PasswordUtil.checkPassword(password, hashedPasswordFromDB)) {
                     HttpSession session = request.getSession();
                     session.setAttribute("userName", rs.getString("name"));
                     session.setAttribute("userEmail", rs.getString("email"));
-                    response.sendRedirect(request.getContextPath() + "/index.jsp");
+                    session.setAttribute("permission", permission); // Lưu quyền vào session
+
+                    // --- PHÂN QUYỀN CHUYỂN HƯỚNG ---
+                    if (permission == 0) {
+                        // Admin -> Trang quản trị
+                        response.sendRedirect(request.getContextPath() + "/admin");
+                    } else if (permission == 1) {
+                        // Nhân viên -> Trang nhân viên
+                        response.sendRedirect(request.getContextPath() + "/staff");
+                    } else {
+                        // Khách hàng -> Trang chủ (hoặc profile)
+                        response.sendRedirect(request.getContextPath() + "/profile");
+                    }
                 } else {
-                    // Sai mật khẩu
                     response.sendRedirect(request.getContextPath() + "/login.jsp?error=login_failed");
                 }
             } else {
-                // Không tìm thấy email
                 response.sendRedirect(request.getContextPath() + "/login.jsp?error=login_failed");
             }
 

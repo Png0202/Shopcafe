@@ -14,7 +14,7 @@
     <!-- Cấu hình trang chào mừng (welcome file) -->
     <!-- Khi truy cập root URL, Tomcat sẽ tự động load index.jsp -->
     <welcome-file-list>
-        <welcome-file>index.jsp</welcome-file>
+        <welcome-file>home</welcome-file>
     </welcome-file-list>
 
     <!-- Cấu hình session timeout (30 phút) -->

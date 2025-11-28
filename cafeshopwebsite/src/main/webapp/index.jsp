@@ -1,46 +1,152 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
+<%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quán Cà Phê - Trang Chủ</title>
-    <!-- Link đến file CSS -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+    <style>
+        /* CSS RIÊNG CHO LAYOUT XẾP TẦNG (BEST SELLER) */
+        .best-seller-section {
+            padding: 80px 0;
+            background-color: #fff;
+        }
+        .layer-item {
+            display: flex;
+            align-items: center;
+            gap: 60px;
+            margin-bottom: 100px; /* Khoảng cách giữa các món */
+            opacity: 0;
+            transform: translateY(50px);
+            animation: fadeInUp 0.8s forwards;
+        }
+        .layer-image {
+            flex: 1;
+            position: relative;
+        }
+        .layer-image img {
+            width: 100%;
+            height: 450px;
+            object-fit: cover;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            transition: transform 0.5s ease;
+        }
+        .layer-image img:hover {
+            transform: scale(1.03);
+        }
+        
+        /* Badge Top 1, 2, 3 */
+        .rank-badge {
+            position: absolute; top: -25px;
+            background: linear-gradient(45deg, #d35400, #e67e22);
+            color: #fff;
+            padding: 12px 25px;
+            font-weight: 800;
+            font-size: 16px;
+            border-radius: 50px;
+            box-shadow: 0 5px 15px rgba(211, 84, 0, 0.4);
+            z-index: 2;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .layer-content {
+            flex: 1;
+        }
+        .layer-title {
+            font-size: 42px;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-weight: 900;
+            line-height: 1.2;
+        }
+        .layer-desc {
+            font-size: 18px;
+            color: #666;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+        .layer-price {
+            font-size: 32px;
+            color: #d35400;
+            font-weight: bold;
+            margin-bottom: 35px;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        .btn-order-now {
+            display: inline-block;
+            padding: 15px 50px;
+            background-color: #2c3e50;
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(44, 62, 80, 0.3);
+        }
+        .btn-order-now:hover {
+            background-color: #d35400;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(211, 84, 0, 0.4);
+        }
+
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive Mobile */
+        @media (max-width: 768px) {
+            .layer-item { flex-direction: column !important; gap: 30px; text-align: center !important; }
+            .layer-content { text-align: center !important; }
+            .rank-badge { left: 50% !important; right: auto !important; transform: translateX(-50%); }
+            .layer-image img { height: 300px; }
+        }
+    </style>
 </head>
 <body>
-    <!-- 
-        PHẦN HEADER - Thanh điều hướng phía trên
-        Header này sẽ được sử dụng lại trên mọi trang
-    -->
+    
+    <%-- HEADER --%>
     <header>
         <div class="container">
             <h1>☕ Quán Cà Phê Vĩnh Long</h1>
             <nav>
                 <ul>
-                    <%-- 1. MENU CÔNG KHAI (Ai cũng thấy) --%>
-                    <li><a href="${pageContext.request.contextPath}/index.jsp">Trang Chủ</a></li>
-                    
-                    <%-- Lưu ý: Ở file menu.jsp thì thêm class="active" vào dòng này --%>
+                    <%-- MENU CHUNG --%>
+                    <li><a href="${pageContext.request.contextPath}/home">Trang Chủ</a></li>
                     <li><a href="${pageContext.request.contextPath}/menu">Thực Đơn</a></li>
 
-                    <%-- 2. LOGIC KIỂM TRA ĐĂNG NHẬP --%>
+                    <%-- LOGIC PHÂN QUYỀN --%>
                     <c:choose>
-                        <%-- TRƯỜNG HỢP ĐÃ ĐĂNG NHẬP --%>
                         <c:when test="${not empty sessionScope.userEmail}">
-                            <%-- A. Hiện Giỏ Hàng (Chỉ dành cho thành viên) --%>
-                            <li><a href="${pageContext.request.contextPath}/cart">Giỏ Hàng</a></li>
-                            
-                            <%-- B. Hiện Tài Khoản --%>
-                            <li>
-                                <a href="${pageContext.request.contextPath}/profile" style="font-weight: bold; color: #d35400;">
-                                    Tài Khoản (${sessionScope.userName})
-                                </a>
-                            </li>
+                            <%-- ĐÃ ĐĂNG NHẬP --%>
+                            <c:choose>
+                                <%-- QUYỀN ADMIN (0) --%>
+                                <c:when test="${sessionScope.permission == 0}">
+                                    <li><a href="${pageContext.request.contextPath}/admin" style="color:red;font-weight:bold;">QUẢN TRỊ</a></li>
+                                </c:when>
+                                
+                                <%-- QUYỀN NHÂN VIÊN (1) --%>
+                                <c:when test="${sessionScope.permission == 1}">
+                                    <li><a href="${pageContext.request.contextPath}/staff" style="color:blue;font-weight:bold;">NHÂN VIÊN</a></li>
+                                </c:when>
+                                
+                                <%-- QUYỀN KHÁCH HÀNG (2 hoặc khác) --%>
+                                <c:otherwise>
+                                    <li><a href="${pageContext.request.contextPath}/cart">Giỏ Hàng</a></li>
+                                    <li><a href="${pageContext.request.contextPath}/profile" style="color:#d35400;font-weight:bold;">Tài Khoản (${sessionScope.userName})</a></li>
+                                </c:otherwise>
+                            </c:choose>
                         </c:when>
                         
-                        <%-- TRƯỜNG HỢP CHƯA ĐĂNG NHẬP --%>
+                        <%-- CHƯA ĐĂNG NHẬP --%>
                         <c:otherwise>
                             <li><a href="${pageContext.request.contextPath}/login.jsp">Đăng Nhập</a></li>
                         </c:otherwise>
@@ -50,162 +156,61 @@
         </div>
     </header>
 
-    <!-- 
-        PHẦN HERO - Banner chào mừng lớn
-        Đây là phần thu hút sự chú ý đầu tiên của khách hàng
-    -->
+    <%-- HERO BANNER --%>
     <section class="hero">
         <div class="container">
-            <h2>Chào Mừng Đến Với Quán Cà Phê Của Chúng Tôi</h2>
-            <p>Nơi mang đến cho bạn những tách cà phê thơm ngon nhất và không gian thư giãn tuyệt vời</p>
-            <a href="${pageContext.request.contextPath}/menu" class="btn">Xem Thực Đơn</a>
+            <h2>Hương Vị Đánh Thức Mọi Giác Quan</h2>
+            <p>Trải nghiệm cà phê nguyên bản và không gian thư giãn tuyệt vời tại Vĩnh Long</p>
         </div>
     </section>
 
-    <!-- 
-        PHẦN SẢN PHẨM NỔI BẬT
-        Hiển thị một số sản phẩm đặc biệt để thu hút khách hàng
-        
-        LƯU Ý QUAN TRỌNG: Đây là MOCK DATA (dữ liệu giả)
-        Trong thực tế, dữ liệu này sẽ được gửi từ Servlet (backend)
-        Nhưng để test frontend độc lập, chúng ta tạo dữ liệu trực tiếp trong JSP
-    -->
-    <section class="products-section">
+    <%-- SẢN PHẨM NỔI BẬT (BEST SELLER - KIỂU XẾP TẦNG) --%>
+    <section class="best-seller-section">
         <div class="container">
-            <h2 class="section-title">Sản Phẩm Nổi Bật</h2>
             
-            <%-- 
-                Tạo mock data cho sản phẩm nổi bật
-                Trong thực tế, phần này sẽ được thay bằng: ${products} từ Servlet
-            --%>
-            <jsp:useBean id="featuredProducts" class="java.util.ArrayList" scope="page"/>
-            <%
-                // Import các class cần thiết
-                java.util.List<com.cafe.model.Product> products = 
-                    (java.util.List<com.cafe.model.Product>) pageContext.getAttribute("featuredProducts");
+            <c:forEach var="product" items="${featuredProducts}" varStatus="status">
                 
-                // Tạo dữ liệu giả cho sản phẩm
-                // Khi có backend, phần này sẽ được thay bằng dữ liệu từ database
-                products.add(new com.cafe.model.Product(
-                    1, 
-                    "Cà Phê Sữa Đá", 
-                    "Cà phê truyền thống Việt Nam với sữa đặc thơm ngon",
-                    25000,
-                    "Cà Phê",
-                    "https://images.unsplash.com/photo-1517487881594-2787fef5ebf7?w=400"
-                ));
-                
-                products.add(new com.cafe.model.Product(
-                    2,
-                    "Trà Đào Cam Sả",
-                    "Trà trái cây tươi mát với đào, cam và sả thơm",
-                    35000,
-                    "Trà",
-                    "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400"
-                ));
-                
-                products.add(new com.cafe.model.Product(
-                    3,
-                    "Bánh Tiramisu",
-                    "Bánh Tiramisu Italia với cà phê espresso đậm đà",
-                    45000,
-                    "Bánh",
-                    "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=400"
-                ));
-            %>
-            
-            <%-- 
-                Hiển thị danh sách sản phẩm sử dụng JSTL
-                JSTL giúp code sạch hơn so với scriptlet Java thuần
-                
-                Giải thích:
-                - c:forEach: Vòng lặp giống như "for each" trong Java
-                - var="product": Biến đại diện cho từng sản phẩm trong vòng lặp
-                - items="${featuredProducts}": Danh sách sản phẩm cần lặp
-            --%>
-            <div class="products-grid">
-                <c:forEach var="product" items="${featuredProducts}">
-                    <div class="product-card">
-                        <%-- 
-                            Hiển thị hình ảnh sản phẩm
-                            ${product.imageUrl} là Expression Language (EL) 
-                            Nó tương đương với product.getImageUrl() trong Java
-                        --%>
-                        <img src="${product.imageUrl}" 
-                             alt="${product.name}" 
-                             class="product-image"
-                             onerror="this.src='https://placehold.co/400x200?text=Cafe'">
-                        
-                        <div class="product-info">
-                            <h3 class="product-name">${product.name}</h3>
-                            <p class="product-description">${product.description}</p>
-                            
-                            <%-- 
-                                Định dạng giá tiền sử dụng JSTL fmt
-                                pattern="#,###" sẽ hiển thị: 25000 thành 25,000
-                            --%>
-                            <p class="product-price">
-                                <c:out value="${product.price}"/> VNĐ
-                            </p>
-                            
-                            <%-- Nút thêm vào giỏ hàng --%>
-                            <div class="product-actions">
-                                <a href="${pageContext.request.contextPath}/cart.jsp?add=${product.id}" 
-                                   class="btn">
-                                    Thêm Vào Giỏ
-                                </a>
-                            </div>
-                        </div>
+                <div class="layer-item" style="animation-delay: ${status.index * 0.2}s; flex-direction: ${status.index % 2 == 0 ? 'row' : 'row-reverse'};">
+                    
+                    <div class="layer-image">
+                        <img src="${product.imageUrl}" alt="${product.name}" onerror="this.src='https://placehold.co/600x450?text=${product.name}'">
                     </div>
-                </c:forEach>
-            </div>
-            
-            <%-- Nút xem thêm sản phẩm --%>
-            <div style="text-align: center; margin-top: 2rem;">
-                <a href="${pageContext.request.contextPath}/menu" class="btn btn-secondary">
-                    Xem Tất Cả Sản Phẩm
-                </a>
+
+                    <div class="layer-content" style="text-align: ${status.index % 2 == 0 ? 'left' : 'right'};">
+                        <h3 class="layer-title">${product.name}</h3>
+                        
+                        <p class="layer-desc">
+                            ${not empty product.description ? product.description : 'Hương vị đậm đà khó quên, được pha chế từ những nguyên liệu tuyển chọn kỹ lưỡng nhất. Một sự lựa chọn hoàn hảo để bắt đầu ngày mới.'}
+                        </p>
+                        
+                        <div class="layer-price">
+                            <fmt:formatNumber value="${product.price}" pattern="#,###"/> VNĐ
+                        </div>
+
+                        <form action="cart" method="post" style="display: inline-block;">
+                            <input type="hidden" name="action" value="add">
+                            <input type="hidden" name="productId" value="${product.id}">
+                            <button type="submit" class="btn-order-now">
+                                Đặt Món Ngay ➔
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+            </c:forEach>
+
+            <div style="text-align: center; margin-top: 50px;">
+                <a href="${pageContext.request.contextPath}/menu" class="btn btn-secondary" style="padding: 15px 40px; border-radius: 50px;">Xem Tất Cả Thực Đơn</a>
             </div>
         </div>
     </section>
 
-    <%-- 
-        PHẦN FOOTER - Chân trang
-        Footer này cũng sẽ được sử dụng lại trên mọi trang
-    --%>
+    <%-- FOOTER --%>
     <footer>
         <div class="container">
             <p>&copy; 2025 Quán Cà Phê Vĩnh Long. Đồ án môn học Công Nghệ Thông Tin 1.</p>
             <p>Sinh viên thực hiện: Phan Tuấn Cảnh - Võ Phúc Nguyên</p>
         </div>
     </footer>
-
-    <%-- 
-        JAVASCRIPT (nếu cần)
-        Có thể thêm các script để làm trang động hơn
-    --%>
-    <script>
-        // Script đơn giản để thông báo khi thêm vào giỏ hàng
-        document.querySelectorAll('.product-actions .btn').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                // Tạm thời không chặn link để có thể chuyển trang
-                // e.preventDefault();
-                
-                // Hiển thị thông báo
-                alert('Đã thêm sản phẩm vào giỏ hàng!');
-            });
-        });
-    </script>
 </body>
-<script>
-    // Debug script - xem context path
-    console.log('Context Path:', '${pageContext.request.contextPath}');
-    
-    // Kiểm tra tất cả các link
-    document.querySelectorAll('a').forEach(link => {
-        if (link.href.includes('cart')) {
-            console.log('Cart Link:', link.href);
-        }
-    });
-</script>
 </html>

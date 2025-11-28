@@ -15,6 +15,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 @WebServlet("/menu")
 public class MenuServlet extends HttpServlet {
@@ -22,7 +23,18 @@ public class MenuServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         List<Product> productList = new ArrayList<>();
-
+        // --- LOGIC CHO NHÂN VIÊN (POS) ---
+        HttpSession session = request.getSession();
+        String tableId = request.getParameter("tableId");
+        
+        if (tableId != null) {
+            // Nếu có tableId trên URL, nghĩa là đang gọi món cho bàn này
+            session.setAttribute("currentTableId", tableId);
+            request.setAttribute("isOrderingForTable", true); // Để hiện thông báo trên JSP
+        } else {
+            // Nếu không có param, kiểm tra xem trong session có đang giữ bàn nào không
+            // Nếu muốn thoát chế độ bàn, nhân viên phải bấm nút "Thoát" (sẽ làm sau)
+        }
         try (Connection conn = DBConnection.getConnection()) {
             // Lấy tất cả sản phẩm từ database
             String sql = "SELECT * FROM products";

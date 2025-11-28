@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
+<%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -8,49 +8,113 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thực Đơn - Quán Cà Phê</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+    <style>
+        /* --- CSS CHO BỘ LỌC (STYLE NỔI) --- */
+        .category-filter {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .category-btn {
+            padding: 12px 25px;
+            border: none;
+            background-color: #f8f9fa;
+            color: #555;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 1px solid transparent;
+        }
+
+        .category-btn:hover {
+            background-color: #fff;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            color: #d35400; 
+            border-color: #d35400;
+        }
+
+        .category-btn.active {
+            background: linear-gradient(45deg, #d35400, #e67e22);
+            color: white;
+            box-shadow: 0 4px 15px rgba(211, 84, 0, 0.4);
+            transform: scale(1.05);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .category-btn { padding: 10px 15px; font-size: 13px; }
+        }
+    </style>
 </head>
 <body>
-    <%-- HEADER --%>
-    <header>
-        <div class="container">
-            <h1>☕ Quán Cà Phê Vĩnh Long</h1>
-            <nav>
-                <ul>
-                    <%-- 1. MENU CÔNG KHAI (Ai cũng thấy) --%>
-                    <li><a href="${pageContext.request.contextPath}/index.jsp">Trang Chủ</a></li>
-                    
-                    <%-- Lưu ý: Ở file menu.jsp thì thêm class="active" vào dòng này --%>
-                    <li><a href="${pageContext.request.contextPath}/menu">Thực Đơn</a></li>
-
-                    <%-- 2. LOGIC KIỂM TRA ĐĂNG NHẬP --%>
-                    <c:choose>
-                        <%-- TRƯỜNG HỢP ĐÃ ĐĂNG NHẬP --%>
-                        <c:when test="${not empty sessionScope.userEmail}">
-                            <%-- A. Hiện Giỏ Hàng (Chỉ dành cho thành viên) --%>
-                            <li><a href="${pageContext.request.contextPath}/cart">Giỏ Hàng</a></li>
-                            
-                            <%-- B. Hiện Tài Khoản --%>
-                            <li>
-                                <a href="${pageContext.request.contextPath}/profile" style="font-weight: bold; color: #d35400;">
-                                    Tài Khoản (${sessionScope.userName})
-                                </a>
-                            </li>
-                        </c:when>
-                        
-                        <%-- TRƯỜNG HỢP CHƯA ĐĂNG NHẬP --%>
-                        <c:otherwise>
-                            <li><a href="${pageContext.request.contextPath}/login.jsp">Đăng Nhập</a></li>
-                        </c:otherwise>
-                    </c:choose>
-                </ul>
-            </nav>
+    
+    <%-- 
+       =========================================================
+       PHẦN 1: THANH TRẠNG THÁI POS (MÀU XANH)
+       Chỉ hiển thị khi NHÂN VIÊN đang gọi món cho bàn
+       =========================================================
+    --%>
+    <c:if test="${not empty sessionScope.currentTableId}">
+        <div style="background: #28a745; color: white; padding: 15px; text-align: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.2); width: 100%; margin: 0;">
+            <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="margin: 0; font-size: 18px;">GỌI MÓN CHO BÀN SỐ ${sessionScope.currentTableId}</h3>
+                <div>
+                    <a href="${pageContext.request.contextPath}/cart" class="btn" style="background: white; color: #28a745; border: none; padding: 8px 15px; font-size: 14px; text-decoration: none;">Xem Món Đã Gọi</a>
+                    <a href="${pageContext.request.contextPath}/staff" class="btn btn-secondary" style="margin-left: 10px; padding: 8px 15px; font-size: 14px; background: rgba(0,0,0,0.2); color: white; text-decoration: none;">Trở Về Trang Chủ</a>
+                </div>
+            </div>
         </div>
-    </header>
+    </c:if>
+
+    <%-- 
+       =========================================================
+       PHẦN 2: HEADER CHÍNH (MÀU NÂU)
+       Chỉ hiển thị khi KHÁCH HÀNG truy cập (Không có bàn)
+       =========================================================
+    --%>
+    <c:if test="${empty sessionScope.currentTableId}">
+        <header>
+            <div class="container">
+                <h1>☕ Quán Cà Phê Vĩnh Long</h1>
+                <nav>
+                    <ul>
+                        <li><a href="${pageContext.request.contextPath}/home">Trang Chủ</a></li>
+                        <li><a href="${pageContext.request.contextPath}/menu" class="active">Thực Đơn</a></li>
+                        
+                        <c:choose>
+                            <c:when test="${not empty sessionScope.userEmail}">
+                                <c:choose>
+                                    <c:when test="${sessionScope.permission == 0}">
+                                        <li><a href="${pageContext.request.contextPath}/admin" style="color:red;font-weight:bold;">QUẢN TRỊ</a></li>
+                                    </c:when>
+                                    <c:when test="${sessionScope.permission == 1}">
+                                        <li><a href="${pageContext.request.contextPath}/staff" style="color:blue;font-weight:bold;">NHÂN VIÊN</a></li>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <li><a href="${pageContext.request.contextPath}/cart">Giỏ Hàng</a></li>
+                                        <li><a href="${pageContext.request.contextPath}/profile" style="font-weight: bold; color: #d35400;">Tài Khoản (${sessionScope.userName})</a></li>
+                                    </c:otherwise>
+                                </c:choose>
+                            </c:when>
+                            <c:otherwise>
+                                <li><a href="${pageContext.request.contextPath}/login.jsp">Đăng Nhập</a></li>
+                            </c:otherwise>
+                        </c:choose>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+    </c:if>
 
     <section class="products-section">
         <div class="container">
-            <h2 class="section-title">Thực Đơn Của Chúng Tôi</h2>
-            
             <%-- BỘ LỌC --%>
             <div class="category-filter">
                 <button class="category-btn active" data-category="all">Tất Cả</button>
@@ -59,21 +123,12 @@
                 <button class="category-btn" data-category="cake">Bánh & Snack</button>
             </div>
 
-            <%-- 
-                HIỂN THỊ DANH SÁCH SẢN PHẨM TỪ DATABASE
-                Biến ${allProducts} được gửi từ MenuServlet
-            --%>
+            <%-- DANH SÁCH SẢN PHẨM --%>
             <div class="products-grid">
                 <c:forEach var="product" items="${allProducts}">
-                    <%-- Logic xác định category để filter JS hoạt động --%>
-                    <div class="product-card" 
-                         data-category="${product.category == 'Cà Phê' ? 'coffee' : 
-                                          product.category == 'Trà' ? 'tea' : 'cake'}">
+                    <div class="product-card" data-category="${product.category == 'Cà Phê' ? 'coffee' : product.category == 'Trà' ? 'tea' : 'cake'}">
                         
-                        <img src="${product.imageUrl}" 
-                             alt="${product.name}" 
-                             class="product-image"
-                             onerror="this.src='https://placehold.co/400x200?text=${product.name}'">
+                        <img src="${product.imageUrl}" alt="${product.name}" class="product-image" onerror="this.src='https://placehold.co/400x200?text=${product.name}'">
                         
                         <div class="product-info">
                             <h3 class="product-name">${product.name}</h3>
@@ -83,10 +138,6 @@
                                 <fmt:formatNumber value="${product.price}" type="number" pattern="#,###"/> VNĐ
                             </p>
                             
-                            <%-- 
-                                NÚT THÊM VÀO GIỎ HÀNG (DATABASE)
-                                Sử dụng Form để gửi dữ liệu sang CartServlet
-                            --%>
                             <div class="product-actions">
                                 <form action="cart" method="post">
                                     <input type="hidden" name="action" value="add">
@@ -101,7 +152,6 @@
         </div>
     </section>
 
-    <%-- FOOTER --%>
     <footer>
         <div class="container">
             <p>&copy; 2025 Quán Cà Phê Vĩnh Long. Đồ án môn học Công Nghệ Thông Tin 1.</p>
@@ -109,7 +159,6 @@
         </div>
     </footer>
 
-    <%-- JAVASCRIPT FILTER (Giữ nguyên) --%>
     <script>
         const categoryButtons = document.querySelectorAll('.category-btn');
         const productCards = document.querySelectorAll('.product-card');
