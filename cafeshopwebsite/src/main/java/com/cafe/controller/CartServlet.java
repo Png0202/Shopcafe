@@ -89,6 +89,8 @@ public class CartServlet extends HttpServlet {
     // POST: Thêm/Sửa/Xóa món (Giữ nguyên code cũ của bạn, phần này OK)
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
         HttpSession session = request.getSession();
         String email = (String) session.getAttribute("userEmail");
         String currentTableId = (String) session.getAttribute("currentTableId");

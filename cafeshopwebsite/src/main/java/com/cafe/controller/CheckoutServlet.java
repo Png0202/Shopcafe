@@ -104,6 +104,8 @@ public class CheckoutServlet extends HttpServlet {
     // POST: Xử lý đặt hàng
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
         HttpSession session = request.getSession();
         String email = (String) session.getAttribute("userEmail");
 
@@ -185,8 +187,14 @@ public class CheckoutServlet extends HttpServlet {
 
             conn.commit(); // Xác nhận Transaction thành công
 
-            // Chuyển hướng về trang quản lý đơn hàng (Tab Orders)
-            response.sendRedirect(request.getContextPath() + "/profile?tab=orders&status=success");
+            // --- LOGIC ĐIỀU HƯỚNG MỚI ---
+            if ("banking".equals(paymentMethod)) {
+                // Nếu chọn chuyển khoản -> Sang trang QR
+                response.sendRedirect(request.getContextPath() + "/payment_qr.jsp?orderId=" + orderId + "&amount=" + (int)totalMoney);
+            } else {
+                // Nếu chọn tiền mặt -> Về trang đơn hàng
+                response.sendRedirect(request.getContextPath() + "/profile?tab=orders&status=success");
+            }
 
         } catch (Exception e) {
             e.printStackTrace(); // In lỗi ra Console của Eclipse/VS Code

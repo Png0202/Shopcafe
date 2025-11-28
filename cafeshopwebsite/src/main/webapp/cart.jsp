@@ -168,7 +168,7 @@
 
                             <%-- Nút 3: Thanh toán --%>
                             <a href="${pageContext.request.contextPath}/checkout" class="btn" 
-                               style="flex: 1; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center;">Thanh Toán</a>
+                               style="flex: 1; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center;">Đặt Hàng Ngay</a>
                         </div>
                     </div>
                 </c:otherwise>
