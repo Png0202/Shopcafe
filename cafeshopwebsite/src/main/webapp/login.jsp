@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib uri="jakarta.tags.core" prefix="c" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <%-- LOGIC XÁC ĐỊNH TAB NÀO SẼ ĐƯỢC ACTIVE KHI TẢI TRANG --%>
 <c:set var="activeTab" value="login" />
