@@ -1,38 +1,27 @@
-/* ===== GENERAL STYLES ===== */
-/* Reset margin và padding mặc định của trình duyệt */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-/* Định nghĩa màu sắc chính cho website */
+/* ===== 1. GLOBAL VARIABLES & SETTINGS ===== */
 :root {
     --primary-color: #6f4e37;      /* Màu nâu cafe */
     --secondary-color: #d4a373;    /* Màu be nhạt */
-    --accent-color: #ff6b6b;       /* Màu đỏ cam cho các điểm nhấn */
+    --accent-color: #ff6b6b;       /* Màu đỏ cam */
     --text-color: #333;
-    --light-bg: #f8f9fa;
+    --light-bg: #f8f9fa;           /* Trùng với bg-light của Bootstrap */
     --white: #ffffff;
     --shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
-/* Style chung cho body */
+/* Font chữ chung (Bootstrap đã có reset, ta chỉ set font) */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    line-height: 1.6;
     color: var(--text-color);
     background-color: var(--light-bg);
 }
 
-/* Container chính */
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
+/* Link mặc định: Bỏ gạch chân xấu xí */
+a {
+    text-decoration: none;
 }
 
-/* ===== HEADER & NAVIGATION ===== */
+/* ===== 2. HEADER & NAVIGATION (Giữ nguyên Custom vì Bootstrap Nav phức tạp) ===== */
 header {
     background-color: var(--primary-color);
     color: var(--white);
@@ -40,41 +29,91 @@ header {
     box-shadow: var(--shadow);
     position: sticky;
     top: 0;
-    z-index: 1000;
+    z-index: 1020; /* Cao hơn z-index mặc định của Bootstrap components */
 }
 
 header .container {
+    /* Tận dụng container của Bootstrap nhưng thêm flex */
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
+/* Responsive Header cho Mobile */
+@media (max-width: 992px) {
+    header .container {
+        flex-direction: column;
+        text-align: center;
+    }
+    nav ul {
+        margin-top: 10px;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 15px;
+        padding-left: 0; /* Reset padding UL của Bootstrap */
+    }
+}
+
 header h1 {
     font-size: 1.8rem;
     font-weight: bold;
+    margin-bottom: 0; /* Fix lỗi margin của Bootstrap H1 */
 }
 
 nav ul {
     list-style: none;
     display: flex;
     gap: 2rem;
+    margin-bottom: 0; /* Fix lỗi margin UL */
 }
 
 nav a {
     color: var(--white);
-    text-decoration: none;
     font-weight: 500;
-    transition: color 0.3s ease;
     padding: 0.5rem 1rem;
     border-radius: 5px;
+    transition: 0.3s;
 }
 
-nav a:hover {
+nav a:hover, nav a.active {
     background-color: rgba(255,255,255,0.1);
     color: var(--secondary-color);
 }
 
-/* ===== HERO SECTION (Phần giới thiệu trên trang chủ) ===== */
+/* ===== 3. CUSTOM BUTTONS (Ghi đè hoặc bổ sung cho .btn của Bootstrap) ===== */
+/* Nút chính (Màu cam đỏ) - Thay thế cho btn-primary */
+.btn-primary-custom, 
+.btn { 
+    /* Giữ class .btn cũ để tương thích code cũ, nhưng khuyên dùng btn-primary của BS */
+    background-color: var(--accent-color);
+    color: var(--white);
+    border: none;
+    padding: 10px 25px;
+    border-radius: 5px;
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+.btn:hover {
+    background-color: #c49363;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* Nút phụ (Màu be) */
+.btn-secondary-custom, .btn-secondary {
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    border: none;
+}
+
+.btn-secondary:hover {
+    background-color: #c49363;
+    color: white;
+}
+
+/* ===== 4. HERO SECTION ===== */
 .hero {
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     color: var(--white);
@@ -83,338 +122,21 @@ nav a:hover {
     margin-bottom: 2rem;
 }
 
-.hero h2 {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-}
-
-.hero p {
-    font-size: 1.2rem;
-    margin-bottom: 2rem;
-}
-
-.btn {
-    display: inline-block;
-    padding: 12px 30px;
-    background-color: var(--accent-color);
-    color: var(--white);
-    text-decoration: none;
-    border-radius: 5px;
-    transition: all 0.3s ease;
-    border: none;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: 500;
-}
-
-.btn:hover {
-    background-color: #c49363;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(255,107,107,0.3);
-}
-
-.btn-secondary {
-    background-color: var(--secondary-color);
-    color: var(--text-color);
-}
-
-.btn-secondary:hover {
-    background-color: #c49363;
-}
-
-/* ===== PRODUCT GRID (Hiển thị sản phẩm dạng lưới) ===== */
-.products-section {
-    padding: 3rem 0;
-}
-
+/* ===== 5. PRODUCTS & CARDS (Kết hợp với Grid của Bootstrap) ===== */
 .section-title {
     text-align: center;
     font-size: 2rem;
     color: var(--primary-color);
     margin-bottom: 2rem;
-}
-
-.category-filter {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin-bottom: 2rem;
-    flex-wrap: wrap;
-}
-
-.category-btn {
-    padding: 0.5rem 1.5rem;
-    background-color: var(--white);
-    border: 2px solid var(--primary-color);
-    color: var(--primary-color);
-    border-radius: 25px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.category-btn:hover,
-.category-btn.active {
-    background-color: var(--primary-color);
-    color: var(--white);
-}
-
-.products-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 2rem;
-    margin-top: 2rem;
-}
-
-.product-card {
-    background-color: var(--white);
-    border-radius: 10px;
-    box-shadow: var(--shadow);
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-}
-
-.product-image {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-}
-
-.product-info {
-    padding: 1.5rem;
-}
-
-.product-name {
-    font-size: 1.3rem;
-    color: var(--primary-color);
-    margin-bottom: 0.5rem;
-}
-
-.product-description {
-    color: #666;
-    font-size: 0.9rem;
-    margin-bottom: 1rem;
-}
-
-.product-price {
-    font-size: 1.5rem;
-    color: var(--accent-color);
     font-weight: bold;
-    margin-bottom: 1rem;
-}
-
-.product-actions {
-    display: flex;
-    gap: 0.5rem;
-}
-
-/* ===== CART & CHECKOUT ===== */
-.cart-section {
-    padding: 2rem 0;
-    min-height: 60vh;
-}
-
-.cart-table {
+    text-transform: uppercase;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 15px;
+    display: inline-block;
     width: 100%;
-    background-color: var(--white);
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: var(--shadow);
 }
 
-.cart-table table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.cart-table th {
-    background-color: var(--primary-color);
-    color: var(--white);
-    padding: 1rem;
-    text-align: left;
-}
-
-.cart-table td {
-    padding: 1rem;
-    border-bottom: 1px solid #ddd;
-}
-
-.cart-table tr:last-child td {
-    border-bottom: none;
-}
-
-.quantity-controls {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.quantity-controls button {
-    width: 30px;
-    height: 30px;
-    border: none;
-    background-color: var(--secondary-color);
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-.quantity-controls input {
-    width: 50px;
-    text-align: center;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 0.3rem;
-}
-
-.cart-summary {
-    background-color: var(--white);
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: var(--shadow);
-    margin-top: 2rem;
-}
-
-.cart-summary h3 {
-    color: var(--primary-color);
-    margin-bottom: 1rem;
-}
-
-.cart-total {
-    display: flex;
-    justify-content: space-between;
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: var(--accent-color);
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 2px solid #ddd;
-}
-
-/* ===== FORM STYLES ===== */
-.form-container {
-    max-width: 500px;
-    margin: 3rem auto;
-    background-color: var(--white);
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: var(--shadow);
-}
-
-.form-group {
-    margin-bottom: 1.5rem;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    color: var(--primary-color);
-    font-weight: 500;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-    width: 100%;
-    padding: 0.8rem;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 1rem;
-}
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 5px rgba(111,78,55,0.3);
-}
-
-/* ===== FOOTER ===== */
-footer {
-    background-color: var(--primary-color);
-    color: var(--white);
-    text-align: center;
-    padding: 2rem 0;
-    margin-top: 3rem;
-}
-
-footer p {
-    margin-bottom: 0.5rem;
-}
-
-/* ===== RESPONSIVE DESIGN ===== */
-/* Điều chỉnh cho màn hình nhỏ hơn tablet */
-@media (max-width: 768px) {
-    header .container {
-        flex-direction: column;
-        gap: 1rem;
-    }
-    
-    nav ul {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 1rem;
-    }
-    
-    .hero h2 {
-        font-size: 1.8rem;
-    }
-    
-    .products-grid {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 1rem;
-    }
-    
-    .cart-table {
-        overflow-x: auto;
-    }
-}
-
-/* Điều chỉnh cho mobile */
-@media (max-width: 480px) {
-    .hero {
-        padding: 2rem 1rem;
-    }
-    
-    .hero h2 {
-        font-size: 1.5rem;
-    }
-    
-    .products-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* ===== ALERT & MESSAGES ===== */
-.alert {
-    padding: 1rem;
-    border-radius: 5px;
-    margin-bottom: 1rem;
-}
-
-.alert-success {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-
-.alert-error {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-
-.alert-info {
-    background-color: #d1ecf1;
-    color: #0c5460;
-    border: 1px solid #bee5eb;
-}
-/* --- CSS CHO BỘ LỌC (CATEGORY FILTER) --- */
+/* Filter Button nổi */
 .category-filter {
     display: flex;
     justify-content: center;
@@ -424,183 +146,105 @@ footer p {
 }
 
 .category-btn {
-    padding: 12px 25px;
-    border: none;
-    background-color: #f8f9fa; /* Màu nền sáng */
+    padding: 10px 25px;
+    border: 1px solid #eee;
+    background-color: var(--white);
     color: #555;
-    font-size: 15px;
-    font-weight: 600;
-    border-radius: 50px; /* Bo tròn hoàn toàn */
+    border-radius: 50px;
     cursor: pointer;
-    transition: all 0.3s ease;
-    
-    /* Hiệu ứng đổ bóng nhẹ ban đầu */
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-    border: 1px solid transparent;
+    transition: all 0.3s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-/* Hiệu ứng khi di chuột vào (Hover) */
-.category-btn:hover {
-    background-color: #fff;
-    transform: translateY(-3px); /* Nổi lên trên */
-    box-shadow: 0 6px 12px rgba(0,0,0,0.15); /* Bóng đậm hơn */
-    color: #d35400; /* Đổi màu chữ sang màu chủ đạo */
-    border-color: #d35400;
-}
-
-/* Trạng thái đang chọn (Active) */
-.category-btn.active {
-    background: linear-gradient(45deg, #d35400, #e67e22); /* Màu gradient cam */
+.category-btn:hover, .category-btn.active {
+    background: linear-gradient(45deg, #d35400, #e67e22);
     color: white;
-    box-shadow: 0 4px 15px rgba(211, 84, 0, 0.4); /* Bóng màu cam */
-    transform: scale(1.05); /* Phóng to nhẹ */
+    border-color: transparent;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(211, 84, 0, 0.3);
 }
 
-/* Responsive cho mobile */
+/* Product Card được tinh chỉnh để dùng chung với col-md-3 của Bootstrap */
+.product-card {
+    background-color: var(--white);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: transform 0.3s ease;
+    height: 100%; /* Để các card bằng nhau trong row */
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.product-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.product-info { padding: 1.5rem; text-align: center; }
+.product-name { font-size: 1.2rem; font-weight: bold; color: var(--primary-color); }
+.product-price { font-size: 1.2rem; color: var(--accent-color); font-weight: bold; display: block; margin: 10px 0; }
+
+/* Grid Sản phẩm: Giữ lại grid cũ hoặc dùng row/col của Bootstrap */
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); /* Responsive tự động */
+    gap: 2rem;
+}
+
+/* ===== 6. TABLE & CART ===== */
+/* Sử dụng class .table của Bootstrap, chỉ custom thêm màu header */
+.table thead th {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+}
+
+/* Nút số lượng nhỏ */
+.qty-btn {
+    width: 30px; height: 30px;
+    border: 1px solid #ddd; background: #fff;
+    border-radius: 4px; font-weight: bold;
+}
+.qty-input {
+    width: 50px; text-align: center; border: 1px solid #ddd;
+    margin: 0 5px; border-radius: 4px;
+}
+
+/* ===== 7. FOOTER ===== */
+footer {
+    background-color: var(--primary-color);
+    color: var(--white);
+    text-align: center;
+    padding: 2rem 0;
+    margin-top: auto; /* Đẩy footer xuống đáy */
+}
+
+/* ===== 8. UTILITIES RIÊNG (Hỗ trợ Bootstrap) ===== */
+.text-primary-custom { color: var(--primary-color) !important; }
+.bg-primary-custom { background-color: var(--primary-color) !important; }
+
+/* Fix lỗi hiển thị Sidebar Menu trong trang Account */
+.list-group-item.active {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* ===== 9. BEST SELLER LAYERS ===== */
+.layer-item {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    margin-bottom: 60px;
+}
 @media (max-width: 768px) {
-    .category-btn {
-        padding: 10px 15px;
-        font-size: 13px;
-    }
-}
-/* =========================================
-   RESPONSIVE - TỐI ƯU CHO MOBILE & TABLET
-   ========================================= */
-
-/* --- 1. MÀN HÌNH TABLET (Chiều rộng < 992px) --- */
-@media (max-width: 992px) {
-    
-    /* Header: Logo và Menu xếp dọc */
-    header .container {
-        flex-direction: column;
+    .layer-item {
+        flex-direction: column !important;
         text-align: center;
     }
-    
-    header nav ul {
-        margin-top: 15px;
-        justify-content: center;
-        flex-wrap: wrap; /* Cho phép menu xuống dòng nếu dài */
-        gap: 10px;
-    }
-
-    /* Sản phẩm: Hiện 3 cột thay vì 4 */
-    .products-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-
-    /* Phần Best Seller xếp tầng: Chữ nhỏ lại chút */
-    .layer-title { font-size: 32px; }
-    .layer-image img { height: 350px; }
-}
-
-/* --- 2. MÀN HÌNH MOBILE (Chiều rộng < 768px) --- */
-@media (max-width: 768px) {
-    
-    /* Container: Giảm lề để rộng chỗ hơn */
-    .container {
-        width: 95%;
-        padding: 0 10px;
-    }
-
-    /* Sản phẩm: Hiện 2 cột (hoặc 1 cột nếu muốn to) */
-    .products-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 15px;
-    }
-    
-    /* Banner Hero */
-    .hero h2 { font-size: 28px; }
-    .hero p { font-size: 16px; }
-
-    /* --- BEST SELLER (XẾP TẦNG) --- */
-    /* Ép buộc xếp dọc (Ảnh trên, chữ dưới) và ghi đè style inline */
-    .layer-item {
-        flex-direction: column !important; /* Dùng !important để đè style inline trong JSP */
-        gap: 20px !important;
-        margin-bottom: 60px !important;
-        text-align: center !important;
-    }
-    
-    .layer-content {
-        text-align: center !important; /* Canh giữa nội dung */
-        padding: 0 10px;
-    }
-    
-    .layer-image img {
-        height: 250px; /* Ảnh nhỏ lại cho vừa mobile */
-    }
-    
-    /* Badge Top 1,2,3 căn giữa */
-    .rank-badge {
-        left: 50% !important;
-        right: auto !important;
-        transform: translateX(-50%);
-    }
-
-    /* --- TRANG THANH TOÁN & GIỎ HÀNG --- */
-    /* Chuyển layout 2 cột thành 1 cột dọc */
-    .cart-section .container > div {
-        grid-template-columns: 1fr !important;
-    }
-    
-    /* Ẩn bớt các cột không quan trọng trong bảng giỏ hàng */
-    .cart-table th:nth-child(2), /* Đơn giá */
-    .cart-table td:nth-child(2) {
-        display: none;
-    }
-    
-    /* Nút số lượng to hơn để dễ bấm */
-    .qty-btn {
-        width: 35px;
-        height: 35px;
-    }
-
-    /* --- TRANG ADMIN --- */
-    /* Sidebar admin biến thành menu ngang ở trên hoặc xếp dọc */
-    body {
-        flex-direction: column; /* Body Admin chuyển thành dọc */
-    }
-    .admin-sidebar {
-        width: 100%;
-        box-sizing: border-box;
-    }
-    .stats-grid {
-        grid-template-columns: 1fr; /* Thẻ thống kê xếp dọc */
-    }
-    .charts-wrapper {
-        grid-template-columns: 1fr; /* Biểu đồ xếp dọc */
-    }
-}
-
-/* --- 3. MÀN HÌNH ĐIỆN THOẠI NHỎ (Chiều rộng < 480px) --- */
-@media (max-width: 480px) {
-    /* Sản phẩm: 1 cột duy nhất cho to rõ */
-    .products-grid {
-        grid-template-columns: 1fr;
-    }
-
-    /* Header Menu: Xếp dọc từng món */
-    header nav ul {
-        flex-direction: column;
-        gap: 10px;
-    }
-    
-    /* Các nút bấm to ra full màn hình */
-    .btn, .btn-secondary {
-        width: 100%;
-        margin-bottom: 10px;
-    }
-    
-    /* Ẩn luôn cột hình ảnh trong giỏ hàng nếu quá chật (tùy chọn) */
-    .cart-table img {
-        width: 40px; height: 40px;
-    }
-}
-/* Tạo thanh cuộn ngang cho bảng khi màn hình nhỏ */
-.table-responsive {
-    width: 100%;
-    overflow-x: auto; /* Cho phép cuộn ngang */
-    -webkit-overflow-scrolling: touch; /* Cuộn mượt trên iOS */
-    margin-bottom: 15px;
-    border: 1px solid #eee;
 }

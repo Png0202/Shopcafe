@@ -34,7 +34,7 @@ public class AdminServlet extends HttpServlet {
         }
 
         try (Connection conn = DBConnection.getConnection()) {
-            String sqlRevenue = "SELECT SUM(total_money) FROM orders WHERE status = 'Đã giao'";
+            String sqlRevenue = "SELECT SUM(total_money) FROM orders WHERE status = 'Giao hàng thành công'";
             try (PreparedStatement psRev = conn.prepareStatement(sqlRevenue)) {
                 ResultSet rsRev = psRev.executeQuery();
                 request.setAttribute("totalRevenue", rsRev.next() ? rsRev.getDouble(1) : 0.0);

@@ -39,7 +39,7 @@ public class AdminChartServlet extends HttpServlet {
         if ("revenue".equals(type)) {
             // Doanh thu: Tính tổng tiền, chỉ tính đơn Đã giao
             selectPart = "SUM(total_money)";
-            condition = " WHERE status = 'Đã giao' ";
+            condition = " WHERE status = 'Giao hàng thành công' ";
         } else {
             // Đơn hàng: Đếm số lượng, tính tất cả trạng thái
             selectPart = "COUNT(*)";

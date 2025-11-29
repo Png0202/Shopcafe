@@ -13,102 +13,57 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng Nhập - Quán Cà Phê</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style_login.css">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+    
     <style>
-        /* CSS bổ sung để hiển thị thông báo lỗi đẹp hơn */
-        .alert {
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-            font-size: 14px;
-            text-align: center;
-            font-weight: bold;
-        }
-        .alert-danger {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        /* --- CSS CHECKBOX TÙY CHỈNH ĐẸP HƠN --- */
+        /* Tinh chỉnh cho Form Login đẹp hơn */
+        body { background-color: #f0f2f5; }
         
-        /* 1. Ẩn checkbox mặc định xấu xí của trình duyệt */
-        .form-group.remember input[type="checkbox"],
-        .form-group.terms input[type="checkbox"] {
-            position: absolute;
-            opacity: 0;
-            cursor: pointer;
-            height: 0;
-            width: 0;
+        .login-wrapper {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 0;
         }
-
-        /* 2. Thiết lập vị trí cho Label */
-        .form-group.remember label,
-        .form-group.terms label {
-            position: relative;
-            padding-left: 24px; /* Chừa chỗ cho ô vuông */
-            cursor: pointer;
-            user-select: none; /* Không cho bôi đen text khi click */
-            font-size: 14px;
+        
+        .login-card {
+            width: 100%;
+            max-width: 450px;
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .login-header {
+            background: #6f4e37; /* Màu nâu cà phê */
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        
+        .nav-tabs .nav-link {
             color: #555;
-            display: inline-block;
-            line-height: 22px; /* Căn giữa theo chiều dọc */
+            font-weight: 600;
+            border: none;
+            border-bottom: 3px solid transparent;
         }
-
-        /* 3. Vẽ ô vuông (Checkbox giả) */
-        .form-group.remember label::before,
-        .form-group.terms label::before {
-            content: "";
-            position: absolute;
-            left: 0;
-            top: 1px;
-            height: 16px;
-            width: 16px;
-            background-color: #fff;
-            border: 2px solid #d35400; /* Viền màu cam chủ đạo */
-            border-radius: 4px; /* Bo góc nhẹ */
-            transition: all 0.3s ease;
+        
+        .nav-tabs .nav-link.active {
+            color: #d35400;
+            border-bottom: 3px solid #d35400;
+            background: none;
         }
-
-        /* 4. Vẽ dấu tích (Checkmark) bên trong */
-        .form-group.remember label::after,
-        .form-group.terms label::after {
-            content: "";
-            position: absolute;
-            left: 5px;
-            top: 5px;
-            width: 4px;
-            height: 9px;
-            border: solid white;
-            border-width: 0 2px 2px 0; /* Tạo hình chữ L */
-            transform: rotate(45deg); /* Xoay thành dấu tích */
-            opacity: 0; /* Mặc định ẩn đi */
-            transition: all 0.2s ease;
-        }
-
-        /* 5. Hiệu ứng khi Hover (Di chuột vào) */
-        .form-group.remember:hover label::before,
-        .form-group.terms:hover label::before {
-            background-color: #fdf2e9; /* Màu nền cam nhạt */
-        }
-
-        /* 6. Trạng thái ĐÃ CHỌN (Checked) */
-        /* Khi input được check, đổi màu ô vuông */
-        .form-group.remember input:checked ~ label::before,
-        .form-group.terms input:checked ~ label::before {
-            background-color: #d35400;
-            border-color: #d35400;
-        }
-
-        /* Khi input được check, hiện dấu tích */
-        .form-group.remember input:checked ~ label::after,
-        .form-group.terms input:checked ~ label::after {
-            opacity: 1;
+        
+        .social-btn {
+            width: 100%;
+            margin-bottom: 10px;
+            font-weight: 500;
         }
     </style>
 </head>
@@ -118,144 +73,128 @@
             <h1>☕ Quán Cà Phê Vĩnh Long</h1>
             <nav>
                 <ul>
-                    <%-- 1. MENU CÔNG KHAI (Ai cũng thấy) --%>
                     <li><a href="${pageContext.request.contextPath}/home">Trang Chủ</a></li>
-                    
-                    <%-- Lưu ý: Ở file menu.jsp thì thêm class="active" vào dòng này --%>
                     <li><a href="${pageContext.request.contextPath}/menu">Thực Đơn</a></li>
-
-                    <%-- 2. LOGIC KIỂM TRA ĐĂNG NHẬP --%>
-                    <c:choose>
-                        <%-- TRƯỜNG HỢP ĐÃ ĐĂNG NHẬP --%>
-                        <c:when test="${not empty sessionScope.userEmail}">
-                            <%-- A. Hiện Giỏ Hàng (Chỉ dành cho thành viên) --%>
-                            <li><a href="${pageContext.request.contextPath}/cart">Giỏ Hàng</a></li>
-                            
-                            <%-- B. Hiện Tài Khoản --%>
-                            <li>
-                                <a href="${pageContext.request.contextPath}/profile" style="font-weight: bold; color: #d35400;">
-                                    Tài Khoản (${sessionScope.userName})
-                                </a>
-                            </li>
-                        </c:when>
-                        
-                        <%-- TRƯỜNG HỢP CHƯA ĐĂNG NHẬP --%>
-                        <c:otherwise>
-                            <li><a href="${pageContext.request.contextPath}/login.jsp">Đăng Nhập</a></li>
-                        </c:otherwise>
-                    </c:choose>
+                    <li><a href="${pageContext.request.contextPath}/login.jsp" class="active">Đăng Nhập</a></li>
                 </ul>
             </nav>
         </div>
     </header>
 
     <section class="login-wrapper">
-        <div class="login-container">
+        <div class="card login-card">
             <div class="login-header">
-                <h2>Chào Mừng Bạn Trở Lại</h2>
-                
-                <%-- Thông báo chung (Thành công hoặc Lỗi hệ thống) --%>
-                <c:if test="${param.register == 'success'}">
-                    <div class="alert alert-success">✅ Đăng ký thành công! Vui lòng đăng nhập.</div>
-                </c:if>
-                <c:if test="${param.error == 'db'}">
-                    <div class="alert alert-danger">⚠️ Lỗi hệ thống, vui lòng thử lại sau!</div>
-                </c:if>
+                <h3 class="mb-1">Chào Mừng Bạn!</h3>
+                <p class="mb-0 small opacity-75">Vui lòng đăng nhập để tiếp tục</p>
             </div>
+            
+            <div class="card-body p-4">
+                <c:if test="${param.register == 'success'}">
+                    <div class="alert alert-success py-2 text-center small"><i class="fa-solid fa-check-circle"></i> Đăng ký thành công! Vui lòng đăng nhập.</div>
+                </c:if>
+                <c:if test="${param.error == 'login_failed'}">
+                    <div class="alert alert-danger py-2 text-center small"><i class="fa-solid fa-triangle-exclamation"></i> Sai email hoặc mật khẩu!</div>
+                </c:if>
+                <c:if test="${param.error == 'email_exists'}">
+                    <div class="alert alert-danger py-2 text-center small">⚠️ Email này đã được sử dụng!</div>
+                </c:if>
+                <c:if test="${param.error == 'phone_exists'}">
+                    <div class="alert alert-danger py-2 text-center small">⚠️ Số điện thoại này đã tồn tại!</div>
+                </c:if>
+                <c:if test="${param.error == 'password_mismatch'}">
+                    <div class="alert alert-danger py-2 text-center small">❌ Mật khẩu xác nhận không khớp!</div>
+                </c:if>
 
-            <div class="form-container">
-                <%-- Nút chuyển Tab: Class active phụ thuộc vào biến activeTab --%>
-                <div class="login-tabs">
-                    <button class="login-tab ${activeTab == 'login' ? 'active' : ''}" onclick="switchTab('login')">Đăng Nhập</button>
-                    <button class="login-tab ${activeTab == 'register' ? 'active' : ''}" onclick="switchTab('register')">Đăng Ký</button>
-                </div>
+                <ul class="nav nav-tabs nav-fill mb-4" id="loginTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link ${activeTab == 'login' ? 'active' : ''}" id="login-tab-btn" data-bs-toggle="tab" data-bs-target="#login-panel" type="button">Đăng Nhập</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link ${activeTab == 'register' ? 'active' : ''}" id="register-tab-btn" data-bs-toggle="tab" data-bs-target="#register-panel" type="button">Đăng Ký</button>
+                    </li>
+                </ul>
 
-                <%-- ================= FORM ĐĂNG NHẬP ================= --%>
-                <div id="login-tab" class="tab-content ${activeTab == 'login' ? 'active' : ''}">
+                <div class="tab-content" id="loginTabContent">
                     
-                    <%-- Hiển thị lỗi Đăng nhập tại đây --%>
-                    <c:if test="${param.error == 'login_failed'}">
-                        <div class="alert alert-danger">❌ Sai email hoặc mật khẩu!</div>
-                    </c:if>
+                    <div class="tab-pane fade ${activeTab == 'login' ? 'show active' : ''}" id="login-panel" role="tabpanel">
+                        <form action="${pageContext.request.contextPath}/login" method="post">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Email</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
+                                    <input type="email" name="email" class="form-control" placeholder="Nhập email của bạn" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Mật khẩu</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                                    <input type="password" name="password" class="form-control" placeholder="Nhập mật khẩu" required>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="rememberMe">
+                                    <label class="form-check-label small" for="rememberMe">Ghi nhớ đăng nhập</label>
+                                </div>
+                                <a href="#" class="small text-decoration-none" onclick="alert('Chức năng đang phát triển!')">Quên mật khẩu?</a>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 py-2 fw-bold" style="background-color: #d35400; border-color: #d35400;">ĐĂNG NHẬP</button>
+                        </form>
+                    </div>
 
-                    <form action="${pageContext.request.contextPath}/login" method="post">
-                        <div class="form-group">
-                            <label>Email</label>
-                            <input type="email" name="email" required placeholder="Nhập email của bạn">
-                        </div>
-                        <div class="form-group">
-                            <label>Mật khẩu</label>
-                            <input type="password" name="password" required placeholder="Nhập mật khẩu">
-                        </div>
-                        <div class="form-group remember">
-                            <input type="checkbox" id="remember-me" name="rememberMe">
-                            <label for="remember-me">Ghi nhớ đăng nhập</label>
-                        </div>
-                        <button type="submit" class="btn full">Đăng Nhập</button>
-                        <div class="center-text">
-                            <a href="#" class="link-disabled" onclick="alert('Chức năng đang phát triển!'); return false;">Quên mật khẩu?</a>
-                        </div>
-                    </form>
+                    <div class="tab-pane fade ${activeTab == 'register' ? 'show active' : ''}" id="register-panel" role="tabpanel">
+                        <form action="${pageContext.request.contextPath}/register" method="post">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Họ và tên</label>
+                                <input type="text" name="name" class="form-control" placeholder="Nhập họ tên đầy đủ" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Email</label>
+                                <input type="email" name="email" class="form-control" placeholder="Nhập địa chỉ email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Số điện thoại</label>
+                                <input type="tel" name="phone" class="form-control" placeholder="Nhập 10 số điện thoại" required pattern="[0-9]{10}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Mật khẩu</label>
+                                <input type="password" name="password" class="form-control" placeholder="Tối thiểu 6 ký tự" required minlength="6">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Xác nhận mật khẩu</label>
+                                <input type="password" name="confirmPassword" class="form-control" placeholder="Nhập lại mật khẩu" required>
+                            </div>
+                            <div class="form-check mb-3">
+                                <input type="checkbox" class="form-check-input" id="agreeTerms" required>
+                                <label class="form-check-label small" for="agreeTerms">Tôi đồng ý với <a href="#">Điều khoản sử dụng</a></label>
+                            </div>
+                            <button type="submit" class="btn btn-success w-100 py-2 fw-bold">ĐĂNG KÝ NGAY</button>
+                        </form>
+                    </div>
+
                 </div>
 
-                <%-- ================= FORM ĐĂNG KÝ ================= --%>
-                <div id="register-tab" class="tab-content ${activeTab == 'register' ? 'active' : ''}">
-                    
-                    <%-- Hiển thị lỗi Đăng ký tại đây --%>
-                    <c:if test="${param.error == 'email_exists'}">
-                        <div class="alert alert-danger">⚠️ Email này đã được sử dụng!</div>
-                    </c:if>
-                    <c:if test="${param.error == 'phone_exists'}">
-                        <div class="alert alert-danger">⚠️ Số điện thoại này đã tồn tại!</div>
-                    </c:if>
-                    <c:if test="${param.error == 'password_mismatch'}">
-                        <div class="alert alert-danger">❌ Mật khẩu xác nhận không khớp!</div>
-                    </c:if>
-
-                    <form action="${pageContext.request.contextPath}/register" method="post">
-                        <div class="form-group">
-                            <label>Họ và tên</label>
-                            <input type="text" name="name" required placeholder="Nhập họ và tên">
-                        </div>
-                        <div class="form-group">
-                            <label>Email</label>
-                            <input type="email" name="email" required placeholder="Nhập email">
-                        </div>
-                        <div class="form-group">
-                            <label>Số điện thoại</label>
-                            <input type="tel" name="phone" required pattern="[0-9]{10}" placeholder="Nhập 10 số điện thoại">
-                        </div>
-                        <div class="form-group">
-                            <label>Mật khẩu</label>
-                            <input type="password" name="password" required minlength="6" placeholder="Tối thiểu 6 ký tự">
-                        </div>
-                        <div class="form-group">
-                            <label>Xác nhận mật khẩu</label>
-                            <input type="password" name="confirmPassword" required placeholder="Nhập lại mật khẩu">
-                        </div>
-                        <div class="form-group terms">
-                            <input type="checkbox" id="agree-terms" required>
-                            <label for="agree-terms">
-                                Tôi đồng ý với <a href="#">Điều khoản sử dụng</a>
-                            </label>
-                        </div>
-                        <button type="submit" class="btn full">Đăng Ký</button>
-                    </form>
-                </div>
-
-                <%-- Mạng xã hội --%>
-                <div class="social-login">
-                    <p>Hoặc đăng nhập bằng</p>
-                    <div class="social-buttons">
-                        <button class="btn-secondary" onclick="alert('Chức năng đang phát triển!')">Facebook</button>
-                        <button class="btn-secondary" onclick="alert('Chức năng đang phát triển!')">Google</button>
+                <hr class="my-4">
+                
+                <div class="text-center mb-3 small text-muted">Hoặc đăng nhập bằng</div>
+                <div class="row">
+                    <div class="col-6">
+                        <button class="btn btn-outline-primary social-btn" onclick="alert('Chức năng đang phát triển!')">
+                            <i class="fa-brands fa-facebook"></i> Facebook
+                        </button>
+                    </div>
+                    <div class="col-6">
+                        <button class="btn btn-outline-danger social-btn" onclick="alert('Chức năng đang phát triển!')">
+                            <i class="fa-brands fa-google"></i> Google
+                        </button>
                     </div>
                 </div>
+
             </div>
         </div>
     </section>
 
-    <%-- FOOTER --%>
     <footer>
         <div class="container">
             <p>&copy; 2025 Quán Cà Phê Vĩnh Long. Đồ án môn học Công Nghệ Thông Tin 1.</p>
@@ -263,21 +202,6 @@
         </div>
     </footer>
 
-    <script>
-        function switchTab(tabName) {
-            // Xóa class active ở tất cả các tab và button
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.login-tab').forEach(b => b.classList.remove('active'));
-            
-            // Thêm class active vào đúng tab được chọn
-            if (tabName === 'login') {
-                document.getElementById('login-tab').classList.add('active');
-                document.querySelectorAll('.login-tab')[0].classList.add('active');
-            } else {
-                document.getElementById('register-tab').classList.add('active');
-                document.querySelectorAll('.login-tab')[1].classList.add('active');
-            }
-        }
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

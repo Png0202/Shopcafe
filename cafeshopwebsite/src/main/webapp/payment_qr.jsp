@@ -35,7 +35,10 @@
             <p>Sau khi chuyển khoản thành công, vui lòng bấm nút bên dưới.</p>
         </div>
 
-        <a href="${pageContext.request.contextPath}/profile?tab=orders" class="btn" style="width: 100%; display: block; padding: 15px;">Xác nhận đã chuyển khoản</a>
+        <a href="${pageContext.request.contextPath}/checkout?action=confirm_payment&orderId=${param.orderId}" 
+           class="btn" style="width: 100%; display: block; padding: 15px; text-align: center; text-decoration: none;">
+            Xác nhận đã chuyển khoản
+        </a>
         
         <div style="margin-top: 10px;">
             <a href="${pageContext.request.contextPath}/profile?tab=orders" style="color: #666; text-decoration: underline; font-size: 14px;">Thanh toán sau</a>

@@ -21,13 +21,35 @@ import javax.servlet.http.HttpSession;
 @WebServlet("/checkout")
 public class CheckoutServlet extends HttpServlet {
 
-    // GET: Hiển thị trang thanh toán
+    // GET: Hiển thị trang thanh toán HOẶC Xử lý xác nhận chuyển khoản
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Xử lý lỗi font
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+
         HttpSession session = request.getSession();
         String email = (String) session.getAttribute("userEmail");
+        
+        // 1. Kiểm tra xem có phải là yêu cầu xác nhận thanh toán không?
+        String action = request.getParameter("action");
+        if ("confirm_payment".equals(action)) {
+            int orderId = Integer.parseInt(request.getParameter("orderId"));
+            try (Connection conn = DBConnection.getConnection()) {
+                // Cập nhật trạng thái từ "Chờ thanh toán" sang "Đang xử lý"
+                String sql = "UPDATE orders SET status = 'Đang xử lý' WHERE id = ?";
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ps.setInt(1, orderId);
+                ps.executeUpdate();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            // Chuyển hướng về lịch sử đơn hàng
+            response.sendRedirect(request.getContextPath() + "/profile?tab=orders&status=success");
+            return;
+        }
 
-        // 1. Nếu chưa đăng nhập -> Chuyển về login
+        // 2. Nếu chưa đăng nhập -> Chuyển về login
         if (email == null) {
             response.sendRedirect("login.jsp");
             return;
@@ -37,20 +59,28 @@ public class CheckoutServlet extends HttpServlet {
         double grandTotal = 0;
 
         try (Connection conn = DBConnection.getConnection()) {
-        
-            // 2. Lấy thông tin cơ bản (Tên, SĐT) để điền sẵn vào form
-            String userSql = "SELECT name, phone FROM users WHERE email = ?";
+            
+            // 3. LẤY THÔNG TIN KHÁCH HÀNG & ĐỊA CHỈ MẶC ĐỊNH
+            // Sử dụng LEFT JOIN để lấy địa chỉ từ bảng user_addresses (nơi lưu sổ địa chỉ)
+            String userSql = "SELECT u.name, u.phone, ua.address_line " +
+                             "FROM users u " +
+                             "LEFT JOIN user_addresses ua ON u.email = ua.user_email AND ua.is_default = 1 " +
+                             "WHERE u.email = ?";
+            
             try (PreparedStatement psUser = conn.prepareStatement(userSql)) {
                 psUser.setString(1, email);
                 ResultSet rsUser = psUser.executeQuery();
                 if (rsUser.next()) {
                     request.setAttribute("customerName", rsUser.getString("name"));
                     request.setAttribute("customerPhone", rsUser.getString("phone"));
+                    
+                    // Nếu có địa chỉ mặc định thì lấy, không thì để trống
+                    String defaultAddress = rsUser.getString("address_line");
+                    request.setAttribute("customerAddress", defaultAddress != null ? defaultAddress : "");
                 }
             }
 
-            // 3. LẤY DANH SÁCH ĐỊA CHỈ (Sổ địa chỉ) để hiển thị trong Dropdown
-            // Sắp xếp: Địa chỉ mặc định lên đầu tiên
+            // 4. LẤY DANH SÁCH TẤT CẢ ĐỊA CHỈ (Để hiện Dropdown chọn)
             List<String> addressList = new ArrayList<>();
             String addrSql = "SELECT address_line FROM user_addresses WHERE user_email = ? ORDER BY is_default DESC, id DESC";
             try (PreparedStatement psAddr = conn.prepareStatement(addrSql)) {
@@ -62,7 +92,7 @@ public class CheckoutServlet extends HttpServlet {
             }
             request.setAttribute("listAddresses", addressList);
 
-            // 4. LẤY GIỎ HÀNG để hiển thị tóm tắt
+            // 5. LẤY GIỎ HÀNG
             String sql = "SELECT c.product_id, p.name, p.price, c.quantity " +
                          "FROM cart_items c JOIN products p ON c.product_id = p.id " +
                          "WHERE c.user_email = ?";
@@ -78,7 +108,7 @@ public class CheckoutServlet extends HttpServlet {
                     item.setQuantity(rs.getInt("quantity"));
                     
                     cart.add(item);
-                    grandTotal += item.getPrice() * item.getQuantity(); // Tính tổng tiền
+                    grandTotal += item.getPrice() * item.getQuantity();
                 }
             }
 
@@ -86,16 +116,16 @@ public class CheckoutServlet extends HttpServlet {
             e.printStackTrace();
         }
 
-        // Nếu giỏ hàng rỗng, không cho vào trang thanh toán
+        // Nếu giỏ hàng rỗng, quay về trang cart
         if (cart.isEmpty()) {
             response.sendRedirect("cart"); 
             return;
         }
 
-        // 5. Gửi dữ liệu sang JSP
+        // 6. Gửi dữ liệu sang JSP
         request.setAttribute("cartItems", cart);
         request.setAttribute("subTotal", grandTotal);
-        request.setAttribute("shippingFee", 15000.0); // Phí ship cố định 15k
+        request.setAttribute("shippingFee", 15000.0);
         request.setAttribute("finalTotal", grandTotal + 15000.0);
 
         request.getRequestDispatcher("/checkout.jsp").forward(request, response);
@@ -104,8 +134,10 @@ public class CheckoutServlet extends HttpServlet {
     // POST: Xử lý đặt hàng
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // QUAN TRỌNG: Set UTF-8 để không lỗi font chữ Việt
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
+
         HttpSession session = request.getSession();
         String email = (String) session.getAttribute("userEmail");
 
@@ -114,21 +146,19 @@ public class CheckoutServlet extends HttpServlet {
             return;
         }
 
-        // Lấy dữ liệu từ Form Checkout
+        // Lấy dữ liệu từ Form
         String address = request.getParameter("address");
         String note = request.getParameter("notes");
-        String paymentMethod = request.getParameter("paymentMethod"); // Lấy phương thức thanh toán
+        String paymentMethod = request.getParameter("paymentMethod"); 
 
         try (Connection conn = DBConnection.getConnection()) {
-            conn.setAutoCommit(false); // Bắt đầu Transaction (Giao dịch)
+            conn.setAutoCommit(false); // Bắt đầu Transaction
 
-            // 1. Tính lại tổng tiền & Lấy chi tiết giỏ hàng (Để lưu vào order_details)
+            // 1. Tính lại tổng tiền & Lấy chi tiết giỏ hàng
             double totalMoney = 0;
             List<CartItem> cartItems = new ArrayList<>();
             
-            // Cần lấy thêm image_url và name để lưu cố định vào detail đơn hàng
             String sqlCart = "SELECT c.quantity, p.price, p.name, p.image_url FROM cart_items c JOIN products p ON c.product_id = p.id WHERE user_email=?";
-            
             try (PreparedStatement psCart = conn.prepareStatement(sqlCart)) {
                 psCart.setString(1, email);
                 ResultSet rsCart = psCart.executeQuery();
@@ -143,28 +173,32 @@ public class CheckoutServlet extends HttpServlet {
                     totalMoney += item.getPrice() * item.getQuantity();
                 }
             }
-            totalMoney += 15000; // Cộng phí ship 15k
+            totalMoney += 15000; // Phí ship
 
-            // 2. INSERT ORDERS (Thêm note, payment_method)
-            String sqlOrder = "INSERT INTO orders (user_email, address, total_money, status, order_date, note, payment_method) VALUES (?, ?, ?, 'Đang xử lý', NOW(), ?, ?)";
+            // 2. XÁC ĐỊNH TRẠNG THÁI ĐƠN HÀNG
+            // Nếu chuyển khoản -> "Chờ thanh toán", Tiền mặt -> "Đang xử lý"
+            String initialStatus = "banking".equals(paymentMethod) ? "Chờ thanh toán" : "Đang xử lý";
+
+            // 3. INSERT ORDERS
+            String sqlOrder = "INSERT INTO orders (user_email, address, total_money, status, order_date, note, payment_method) VALUES (?, ?, ?, ?, NOW(), ?, ?)";
             int orderId = 0;
             
             try (PreparedStatement psOrder = conn.prepareStatement(sqlOrder, Statement.RETURN_GENERATED_KEYS)) {
                 psOrder.setString(1, email);
                 psOrder.setString(2, address);
                 psOrder.setDouble(3, totalMoney);
-                psOrder.setString(4, note);
-                psOrder.setString(5, paymentMethod);
+                psOrder.setString(4, initialStatus); // Trạng thái
+                psOrder.setString(5, note);
+                psOrder.setString(6, paymentMethod);
                 psOrder.executeUpdate();
                 
-                // Lấy ID của đơn hàng vừa tạo
                 ResultSet rsKey = psOrder.getGeneratedKeys();
                 if (rsKey.next()) {
                     orderId = rsKey.getInt(1);
                 }
             }
 
-            // 3. INSERT ORDER DETAILS (Lưu từng món ăn vào bảng chi tiết)
+            // 4. INSERT ORDER DETAILS
             String sqlDetail = "INSERT INTO order_details (order_id, product_name, price, quantity, image_url) VALUES (?, ?, ?, ?, ?)";
             try (PreparedStatement psDetail = conn.prepareStatement(sqlDetail)) {
                 for (CartItem item : cartItems) {
@@ -173,42 +207,32 @@ public class CheckoutServlet extends HttpServlet {
                     psDetail.setDouble(3, item.getPrice());
                     psDetail.setInt(4, item.getQuantity());
                     psDetail.setString(5, item.getImageUrl());
-                    psDetail.addBatch(); // Gom lại chạy 1 lần cho tối ưu
+                    psDetail.addBatch(); 
                 }
                 psDetail.executeBatch();
             }
 
-            // 4. Xóa giỏ hàng sau khi đặt thành công
+            // 5. XÓA GIỎ HÀNG
             String sqlClear = "DELETE FROM cart_items WHERE user_email = ?";
             try (PreparedStatement psClear = conn.prepareStatement(sqlClear)) {
                 psClear.setString(1, email);
                 psClear.executeUpdate();
             }
 
-            conn.commit(); // Xác nhận Transaction thành công
+            conn.commit(); // Xác nhận thành công
 
-            // --- LOGIC ĐIỀU HƯỚNG MỚI ---
+            // --- ĐIỀU HƯỚNG ---
             if ("banking".equals(paymentMethod)) {
-                // Nếu chọn chuyển khoản -> Sang trang QR
+                // Chuyển sang trang mã QR
                 response.sendRedirect(request.getContextPath() + "/payment_qr.jsp?orderId=" + orderId + "&amount=" + (int)totalMoney);
             } else {
-                // Nếu chọn tiền mặt -> Về trang đơn hàng
+                // Về trang lịch sử đơn hàng
                 response.sendRedirect(request.getContextPath() + "/profile?tab=orders&status=success");
             }
 
         } catch (Exception e) {
-            e.printStackTrace(); // In lỗi ra Console của Eclipse/VS Code
-            
-            // SỬA ĐOẠN NÀY ĐỂ XEM LỖI TRỰC TIẾP TRÊN TRÌNH DUYỆT
-            response.setContentType("text/html;charset=UTF-8");
-            response.getWriter().println("<h3>Lỗi đặt hàng:</h3>");
-            response.getWriter().println("<p style='color:red'>" + e.getMessage() + "</p>");
-            response.getWriter().println("<pre>");
-            e.printStackTrace(response.getWriter());
-            response.getWriter().println("</pre>");
-            
-            // Tạm thời comment dòng chuyển hướng này lại
-            // response.sendRedirect(request.getContextPath() + "/checkout?error=failed");
+            e.printStackTrace();
+            response.sendRedirect(request.getContextPath() + "/checkout?error=failed");
         }
     }
 }

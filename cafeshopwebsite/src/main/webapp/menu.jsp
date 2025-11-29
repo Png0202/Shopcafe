@@ -7,77 +7,118 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thực Đơn - Quán Cà Phê</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+    
     <style>
-        /* --- CSS CHO BỘ LỌC (STYLE NỔI) --- */
-        .category-filter {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 40px;
-            flex-wrap: wrap;
-        }
+        body { background-color: #f8f9fa; }
 
-        .category-btn {
-            padding: 12px 25px;
-            border: none;
-            background-color: #f8f9fa;
-            color: #555;
-            font-size: 15px;
-            font-weight: 600;
+        /* Tùy chỉnh nút bộ lọc cho đẹp hơn Bootstrap mặc định */
+        .filter-btn {
             border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            border: 1px solid transparent;
+            padding: 8px 25px;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: 2px solid transparent;
         }
-
-        .category-btn:hover {
-            background-color: #fff;
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-            color: #d35400; 
+        
+        /* Trạng thái chưa chọn */
+        .filter-btn.btn-outline-custom {
+            background: white;
             border-color: #d35400;
+            color: #d35400;
+        }
+        
+        .filter-btn.btn-outline-custom:hover {
+            background: #fdf2e9;
+            transform: translateY(-2px);
         }
 
-        .category-btn.active {
+        /* Trạng thái đang chọn */
+        .filter-btn.active {
             background: linear-gradient(45deg, #d35400, #e67e22);
             color: white;
-            box-shadow: 0 4px 15px rgba(211, 84, 0, 0.4);
-            transform: scale(1.05);
+            border-color: transparent;
+            box-shadow: 0 4px 10px rgba(211, 84, 0, 0.3);
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .category-btn { padding: 10px 15px; font-size: 13px; }
+        /* Card Sản Phẩm */
+        .product-card {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            background: white;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .product-img-wrapper {
+            height: 200px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .product-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+
+        .product-card:hover .product-img-wrapper img {
+            transform: scale(1.1);
+        }
+
+        .price-tag {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #d35400;
+        }
+
+        /* Nút thêm giỏ hàng */
+        .btn-add-cart {
+            background-color: #6f4e37;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        .btn-add-cart:hover {
+            background-color: #5a3e2b;
+            color: white;
         }
     </style>
 </head>
 <body>
     
     <%-- 
-       =========================================================
-       PHẦN 1: THANH TRẠNG THÁI POS (MÀU XANH)
-       Chỉ hiển thị khi NHÂN VIÊN đang gọi món cho bàn
-       =========================================================
+       1. THANH TRẠNG THÁI POS (MÀU XANH)
     --%>
     <c:if test="${not empty sessionScope.currentTableId}">
-        <div style="background: #28a745; color: white; padding: 15px; text-align: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.2); width: 100%; margin: 0;">
-            <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
-                <h3 style="margin: 0; font-size: 18px;">GỌI MÓN CHO BÀN SỐ ${sessionScope.currentTableId}</h3>
+        <div class="bg-success text-white py-2 sticky-top shadow-sm">
+            <div class="container d-flex justify-content-between align-items-center">
+                <h5 class="m-0"><i class="fa-solid fa-utensils me-2"></i>ĐANG GỌI MÓN CHO BÀN SỐ ${sessionScope.currentTableId}</h5>
                 <div>
-                    <a href="${pageContext.request.contextPath}/cart" class="btn" style="background: white; color: #28a745; border: none; padding: 8px 15px; font-size: 14px; text-decoration: none;">Xem Món Đã Gọi</a>
-                    <a href="${pageContext.request.contextPath}/staff" class="btn btn-secondary" style="margin-left: 10px; padding: 8px 15px; font-size: 14px; background: rgba(0,0,0,0.2); color: white; text-decoration: none;">Trở Về Trang Chủ</a>
+                    <a href="${pageContext.request.contextPath}/cart" class="btn btn-light btn-sm text-success fw-bold me-2 " style="color: white;">
+                        <i class="fa-solid fa-cart-shopping"></i> Xem Giỏ Bàn Này
+                    </a>
+                    <a href="${pageContext.request.contextPath}/staff" class="btn btn-outline-light btn-sm">
+                        <i class="fa-solid fa-arrow-left"></i> Sơ Đồ
+                    </a>
                 </div>
             </div>
         </div>
     </c:if>
 
     <%-- 
-       =========================================================
-       PHẦN 2: HEADER CHÍNH (MÀU NÂU)
-       Chỉ hiển thị khi KHÁCH HÀNG truy cập (Không có bàn)
-       =========================================================
+       2. HEADER CHÍNH (MÀU NÂU)
     --%>
     <c:if test="${empty sessionScope.currentTableId}">
         <header>
@@ -92,10 +133,10 @@
                             <c:when test="${not empty sessionScope.userEmail}">
                                 <c:choose>
                                     <c:when test="${sessionScope.permission == 0}">
-                                        <li><a href="${pageContext.request.contextPath}/admin" style="color:red;font-weight:bold;">QUẢN TRỊ</a></li>
+                                        <li><a href="${pageContext.request.contextPath}/admin" style="color:#ff6b6b;font-weight:bold;">QUẢN TRỊ</a></li>
                                     </c:when>
                                     <c:when test="${sessionScope.permission == 1}">
-                                        <li><a href="${pageContext.request.contextPath}/staff" style="color:blue;font-weight:bold;">NHÂN VIÊN</a></li>
+                                        <li><a href="${pageContext.request.contextPath}/staff" style="color:#4dabf7;font-weight:bold;">NHÂN VIÊN</a></li>
                                     </c:when>
                                     <c:otherwise>
                                         <li><a href="${pageContext.request.contextPath}/cart">Giỏ Hàng</a></li>
@@ -113,40 +154,57 @@
         </header>
     </c:if>
 
-    <section class="products-section">
+    <section class="products-section py-5">
         <div class="container">
-            <%-- BỘ LỌC --%>
-            <div class="category-filter">
-                <button class="category-btn active" data-category="all">Tất Cả</button>
-                <button class="category-btn" data-category="coffee">Cà Phê</button>
-                <button class="category-btn" data-category="tea">Trà</button>
-                <button class="category-btn" data-category="cake">Bánh & Snack</button>
+            <h2 class="text-center mb-4 text-uppercase fw-bold" style="color: #6f4e37;">Thực Đơn Của Chúng Tôi</h2>
+            
+            <%-- BỘ LỌC DANH MỤC --%>
+            <div class="d-flex justify-content-center flex-wrap gap-2 mb-5">
+                <button class="filter-btn btn-outline-custom active" data-category="all">Tất Cả</button>
+                <button class="filter-btn btn-outline-custom" data-category="coffee"><i class="fa-solid fa-mug-hot me-1"></i> Cà Phê</button>
+                <button class="filter-btn btn-outline-custom" data-category="tea"><i class="fa-solid fa-leaf me-1"></i> Trà</button>
+                <button class="filter-btn btn-outline-custom" data-category="cake"><i class="fa-solid fa-bread-slice me-1"></i> Bánh & Snack</button>
             </div>
 
-            <%-- DANH SÁCH SẢN PHẨM --%>
-            <div class="products-grid">
+            <%-- DANH SÁCH SẢN PHẨM (GRID SYSTEM BOOTSTRAP) --%>
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
                 <c:forEach var="product" items="${allProducts}">
-                    <div class="product-card" data-category="${product.category == 'Cà Phê' ? 'coffee' : product.category == 'Trà' ? 'tea' : 'cake'}">
-                        
-                        <img src="${product.imageUrl}" alt="${product.name}" class="product-image" onerror="this.src='https://placehold.co/400x200?text=${product.name}'">
-                        
-                        <div class="product-info">
-                            <h3 class="product-name">${product.name}</h3>
-                            <p class="product-description">${product.description}</p>
+                    
+                    <%-- 
+                        Logic xác định category cho JS lọc
+                        Lưu ý: data-category đặt ở thẻ COL để ẩn hiện nguyên cột
+                    --%>
+                    <div class="col product-col" data-category="${product.category == 'Cà Phê' ? 'coffee' : product.category == 'Trà' ? 'tea' : 'cake'}">
+                        <div class="card h-100 product-card shadow-sm">
                             
-                            <p class="product-price">
-                                <fmt:formatNumber value="${product.price}" type="number" pattern="#,###"/> VNĐ
-                            </p>
+                            <div class="product-img-wrapper">
+                                <img src="${product.imageUrl}" class="card-img-top" alt="${product.name}" 
+                                     onerror="this.src='https://placehold.co/400x200?text=${product.name}'">
+                            </div>
                             
-                            <div class="product-actions">
-                                <form action="cart" method="post">
-                                    <input type="hidden" name="action" value="add">
-                                    <input type="hidden" name="productId" value="${product.id}">
-                                    <button type="submit" class="btn">Thêm Vào Giỏ</button>
-                                </form>
+                            <div class="card-body d-flex flex-column text-center">
+                                <h5 class="card-title fw-bold" style="color: #333;">${product.name}</h5>
+                                <p class="card-text text-muted small flex-grow-1 text-truncate-2">
+                                    ${product.description}
+                                </p>
+                                
+                                <div class="mt-3">
+                                    <div class="price-tag mb-3">
+                                        <fmt:formatNumber value="${product.price}" type="number" pattern="#,###"/> ₫
+                                    </div>
+                                    
+                                    <form action="cart" method="post">
+                                        <input type="hidden" name="action" value="add">
+                                        <input type="hidden" name="productId" value="${product.id}">
+                                        <button type="submit" class="btn btn-add-cart w-100 py-2">
+                                            <i class="fa-solid fa-cart-plus me-2"></i>Thêm Vào Giỏ
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
+
                 </c:forEach>
             </div>
         </div>
@@ -158,24 +216,34 @@
             <p>Sinh viên thực hiện: Phan Tuấn Cảnh - Võ Phúc Nguyên</p>
         </div>
     </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        const categoryButtons = document.querySelectorAll('.category-btn');
-        const productCards = document.querySelectorAll('.product-card');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const productCols = document.querySelectorAll('.product-col'); // Lấy các cột chứa sản phẩm
 
-        categoryButtons.forEach(button => {
+        filterButtons.forEach(button => {
             button.addEventListener('click', function() {
-                categoryButtons.forEach(btn => btn.classList.remove('active'));
+                // 1. Xử lý Active Button
+                filterButtons.forEach(btn => btn.classList.remove('active'));
                 this.classList.add('active');
                 
                 const selectedCategory = this.getAttribute('data-category');
                 
-                productCards.forEach(card => {
+                // 2. Xử lý Ẩn/Hiện Sản Phẩm
+                productCols.forEach(col => {
                     if (selectedCategory === 'all') {
-                        card.style.display = 'block';
+                        col.style.display = 'block'; // Hiện tất cả
+                        // Fix lỗi animation của Bootstrap grid khi hiện lại
+                        col.classList.add('animate__fadeIn'); 
                     } else {
-                        const cardCategory = card.getAttribute('data-category');
-                        card.style.display = cardCategory === selectedCategory ? 'block' : 'none';
+                        const cardCategory = col.getAttribute('data-category');
+                        if (cardCategory === selectedCategory) {
+                            col.style.display = 'block';
+                        } else {
+                            col.style.display = 'none'; // Ẩn đi
+                        }
                     }
                 });
             });

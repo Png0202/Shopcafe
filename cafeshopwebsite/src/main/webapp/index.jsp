@@ -1,152 +1,83 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quán Cà Phê - Trang Chủ</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+    
     <style>
-        /* CSS RIÊNG CHO LAYOUT XẾP TẦNG (BEST SELLER) */
-        .best-seller-section {
+        /* Tùy chỉnh Hero Section cho đẹp hơn */
+        .hero-section {
+            background: linear-gradient(135deg, #6f4e37, #d4a373);
+            color: white;
             padding: 80px 0;
-            background-color: #fff;
+            margin-bottom: 0;
         }
-        .layer-item {
-            display: flex;
-            align-items: center;
-            gap: 60px;
-            margin-bottom: 100px; /* Khoảng cách giữa các món */
-            opacity: 0;
-            transform: translateY(50px);
-            animation: fadeInUp 0.8s forwards;
-        }
-        .layer-image {
-            flex: 1;
-            position: relative;
-        }
+        
+        /* Hiệu ứng ảnh sản phẩm */
         .layer-image img {
-            width: 100%;
-            height: 450px;
-            object-fit: cover;
-            border-radius: 20px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
             transition: transform 0.5s ease;
+            cursor: pointer;
         }
         .layer-image img:hover {
             transform: scale(1.03);
         }
         
-        /* Badge Top 1, 2, 3 */
+        /* Badge Top Ranking */
         .rank-badge {
-            position: absolute; top: -25px;
-            background: linear-gradient(45deg, #d35400, #e67e22);
-            color: #fff;
-            padding: 12px 25px;
-            font-weight: 800;
-            font-size: 16px;
+            position: absolute;
+            top: -15px;
+            left: -15px;
+            z-index: 10;
+            padding: 10px 25px;
             border-radius: 50px;
-            box-shadow: 0 5px 15px rgba(211, 84, 0, 0.4);
-            z-index: 2;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            font-size: 1.1rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .layer-content {
-            flex: 1;
-        }
-        .layer-title {
-            font-size: 42px;
-            color: #2c3e50;
-            margin-bottom: 25px;
-            font-weight: 900;
-            line-height: 1.2;
-        }
-        .layer-desc {
-            font-size: 18px;
-            color: #666;
-            line-height: 1.8;
-            margin-bottom: 30px;
-        }
-        .layer-price {
-            font-size: 32px;
-            color: #d35400;
-            font-weight: bold;
-            margin-bottom: 35px;
-            font-family: 'Arial', sans-serif;
         }
         
-        .btn-order-now {
-            display: inline-block;
-            padding: 15px 50px;
-            background-color: #2c3e50;
-            color: #fff;
-            border: none;
-            border-radius: 50px;
-            font-size: 16px;
-            font-weight: bold;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 5px 15px rgba(44, 62, 80, 0.3);
-        }
-        .btn-order-now:hover {
-            background-color: #d35400;
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(211, 84, 0, 0.4);
-        }
-
-        @keyframes fadeInUp {
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Responsive Mobile */
-        @media (max-width: 768px) {
-            .layer-item { flex-direction: column !important; gap: 30px; text-align: center !important; }
-            .layer-content { text-align: center !important; }
-            .rank-badge { left: 50% !important; right: auto !important; transform: translateX(-50%); }
-            .layer-image img { height: 300px; }
+        /* Gradient Text cho giá */
+        .price-text {
+            background: -webkit-linear-gradient(45deg, #d35400, #e67e22);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2rem;
         }
     </style>
 </head>
 <body>
     
-    <%-- HEADER --%>
     <header>
         <div class="container">
             <h1>☕ Quán Cà Phê Vĩnh Long</h1>
             <nav>
                 <ul>
-                    <%-- MENU CHUNG --%>
-                    <li><a href="${pageContext.request.contextPath}/home">Trang Chủ</a></li>
+                    <li><a href="${pageContext.request.contextPath}/home" class="active">Trang Chủ</a></li>
                     <li><a href="${pageContext.request.contextPath}/menu">Thực Đơn</a></li>
-
-                    <%-- LOGIC PHÂN QUYỀN --%>
                     <c:choose>
                         <c:when test="${not empty sessionScope.userEmail}">
-                            <%-- ĐÃ ĐĂNG NHẬP --%>
                             <c:choose>
-                                <%-- QUYỀN ADMIN (0) --%>
                                 <c:when test="${sessionScope.permission == 0}">
-                                    <li><a href="${pageContext.request.contextPath}/admin" style="color:red;font-weight:bold;">QUẢN TRỊ</a></li>
+                                    <li><a href="${pageContext.request.contextPath}/admin" style="color:#ff6b6b;font-weight:bold;">QUẢN TRỊ</a></li>
                                 </c:when>
-                                
-                                <%-- QUYỀN NHÂN VIÊN (1) --%>
                                 <c:when test="${sessionScope.permission == 1}">
-                                    <li><a href="${pageContext.request.contextPath}/staff" style="color:blue;font-weight:bold;">NHÂN VIÊN</a></li>
+                                    <li><a href="${pageContext.request.contextPath}/staff" style="color:#4dabf7;font-weight:bold;">NHÂN VIÊN</a></li>
                                 </c:when>
-                                
-                                <%-- QUYỀN KHÁCH HÀNG (2 hoặc khác) --%>
                                 <c:otherwise>
                                     <li><a href="${pageContext.request.contextPath}/cart">Giỏ Hàng</a></li>
-                                    <li><a href="${pageContext.request.contextPath}/profile" style="color:#d35400;font-weight:bold;">Tài Khoản (${sessionScope.userName})</a></li>
+                                    <li><a href="${pageContext.request.contextPath}/profile" style="font-weight: bold; color: #d35400;">Tài Khoản (${sessionScope.userName})</a></li>
                                 </c:otherwise>
                             </c:choose>
                         </c:when>
-                        
-                        <%-- CHƯA ĐĂNG NHẬP --%>
                         <c:otherwise>
                             <li><a href="${pageContext.request.contextPath}/login.jsp">Đăng Nhập</a></li>
                         </c:otherwise>
@@ -156,61 +87,90 @@
         </div>
     </header>
 
-    <%-- HERO BANNER --%>
-    <section class="hero">
+    <section class="hero-section text-center">
         <div class="container">
-            <h2>Hương Vị Đánh Thức Mọi Giác Quan</h2>
-            <p>Trải nghiệm cà phê nguyên bản và không gian thư giãn tuyệt vời tại Vĩnh Long</p>
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <h1 class="display-4 fw-bold mb-3">Hương Vị Đánh Thức Mọi Giác Quan</h1>
+                    <p class="lead mb-4">Trải nghiệm cà phê nguyên bản và không gian thư giãn tuyệt vời tại Vĩnh Long. Chúng tôi mang đến những ly cà phê đậm đà nhất.</p>
+                    <a href="${pageContext.request.contextPath}/menu" class="btn btn-light btn-lg fw-bold text-dark px-5 py-3 rounded-pill shadow">
+                        <i class="fa-solid fa-mug-hot me-2"></i>Khám Phá Menu
+                    </a>
+                </div>
+            </div>
         </div>
     </section>
 
-    <%-- SẢN PHẨM NỔI BẬT (BEST SELLER - KIỂU XẾP TẦNG) --%>
-    <section class="best-seller-section">
-        <div class="container">
+    <section class="py-5 bg-white">
+        <div class="container py-4">
+            <div class="text-center mb-5">
+                <h2 class="text-uppercase fw-bold" style="color: #6f4e37;">🔥 Món Best Seller</h2>
+                <p class="text-muted">Những món được khách hàng yêu thích nhất tại quán</p>
+                <div style="width: 80px; height: 4px; background: #d35400; margin: 0 auto;"></div>
+            </div>
             
             <c:forEach var="product" items="${featuredProducts}" varStatus="status">
                 
-                <div class="layer-item" style="animation-delay: ${status.index * 0.2}s; flex-direction: ${status.index % 2 == 0 ? 'row' : 'row-reverse'};">
+                <div class="row align-items-center mb-5 g-5 ${status.index % 2 != 0 ? 'flex-lg-row-reverse' : ''}">
                     
-                    <div class="layer-image">
-                        <img src="${product.imageUrl}" alt="${product.name}" onerror="this.src='https://placehold.co/600x450?text=${product.name}'">
+                    <div class="col-lg-6 position-relative layer-image">
+                        <div class="rank-badge bg-warning text-dark fw-bold">
+                            <c:choose>
+                                <c:when test="${status.index == 0}"><i class="fa-solid fa-crown"></i> Top 1</c:when>
+                                <c:when test="${status.index == 1}"><i class="fa-solid fa-medal"></i> Top 2</c:when>
+                                <c:when test="${status.index == 2}"><i class="fa-solid fa-award"></i> Top 3</c:when>
+                            </c:choose>
+                        </div>
+                        
+                        <img src="${product.imageUrl}" alt="${product.name}" 
+                             class="img-fluid rounded-4 shadow-lg w-100" 
+                             style="height: 400px; object-fit: cover;"
+                             onerror="this.src='https://placehold.co/600x450?text=${product.name}'">
                     </div>
 
-                    <div class="layer-content" style="text-align: ${status.index % 2 == 0 ? 'left' : 'right'};">
-                        <h3 class="layer-title">${product.name}</h3>
+                    <div class="col-lg-6 ${status.index % 2 != 0 ? 'text-lg-end' : 'text-lg-start'} text-center">
+                        <h2 class="fw-bold mb-3" style="color: #2c3e50;">${product.name}</h2>
                         
-                        <p class="layer-desc">
+                        <p class="lead text-muted mb-4">
                             ${not empty product.description ? product.description : 'Hương vị đậm đà khó quên, được pha chế từ những nguyên liệu tuyển chọn kỹ lưỡng nhất. Một sự lựa chọn hoàn hảo để bắt đầu ngày mới.'}
                         </p>
                         
-                        <div class="layer-price">
+                        <div class="price-text fw-bold mb-4">
                             <fmt:formatNumber value="${product.price}" pattern="#,###"/> VNĐ
                         </div>
 
-                        <form action="cart" method="post" style="display: inline-block;">
+                        <form action="cart" method="post" class="d-inline-block">
                             <input type="hidden" name="action" value="add">
                             <input type="hidden" name="productId" value="${product.id}">
-                            <button type="submit" class="btn-order-now">
-                                Đặt Món Ngay ➔
+                            <button type="submit" class="btn btn-dark btn-lg rounded-pill px-5 py-3 shadow hover-effect">
+                                Đặt Món Ngay <i class="fa-solid fa-arrow-right ms-2"></i>
                             </button>
                         </form>
                     </div>
 
                 </div>
+                
+                <c:if test="${!status.last}">
+                    <hr class="my-5" style="opacity: 0.1;">
+                </c:if>
+
             </c:forEach>
 
-            <div style="text-align: center; margin-top: 50px;">
-                <a href="${pageContext.request.contextPath}/menu" class="btn btn-secondary" style="padding: 15px 40px; border-radius: 50px;">Xem Tất Cả Thực Đơn</a>
+            <div class="text-center mt-5">
+                <a href="${pageContext.request.contextPath}/menu" class="btn btn-outline-secondary rounded-pill px-5 py-3 fw-bold">
+                    Xem Tất Cả Thực Đơn
+                </a>
             </div>
         </div>
     </section>
 
-    <%-- FOOTER --%>
     <footer>
         <div class="container">
             <p>&copy; 2025 Quán Cà Phê Vĩnh Long. Đồ án môn học Công Nghệ Thông Tin 1.</p>
             <p>Sinh viên thực hiện: Phan Tuấn Cảnh - Võ Phúc Nguyên</p>
         </div>
     </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

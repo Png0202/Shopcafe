@@ -27,7 +27,7 @@ public class StaffServlet extends HttpServlet {
         HttpSession session = request.getSession();
         Integer perm = (Integer) session.getAttribute("permission");
 
-        // Bảo mật: Chỉ Admin (0) và Nhân viên (1) được vào
+        // Bảo mật
         if (perm == null || perm > 1) {
             response.sendRedirect("login.jsp");
             return;
@@ -37,11 +37,10 @@ public class StaffServlet extends HttpServlet {
 
         try (Connection conn = DBConnection.getConnection()) {
             
-            // --- 1. AJAX: CẬP NHẬT ĐƠN ONLINE (POLLING - TỰ ĐỘNG) ---
+            // --- 1. AJAX: CẬP NHẬT ĐƠN ONLINE (POLLING) ---
             if ("get_online_orders_ajax".equals(action)) {
                 response.setContentType("text/html;charset=UTF-8");
                 
-                // Lấy danh sách đơn hàng mới nhất
                 String sqlOrder = "SELECT o.*, u.name AS user_name FROM orders o JOIN users u ON o.user_email = u.email WHERE o.order_type = 'online' ORDER BY o.order_date DESC";
                 PreparedStatement psOrder = conn.prepareStatement(sqlOrder);
                 ResultSet rsOrder = psOrder.executeQuery();
@@ -50,45 +49,50 @@ public class StaffServlet extends HttpServlet {
                 
                 while (rsOrder.next()) {
                     int id = rsOrder.getInt("id");
-                    String userName = rsOrder.getString("user_name"); // Lấy tên khách
+                    String userName = rsOrder.getString("user_name");
                     String date = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(rsOrder.getTimestamp("order_date"));
                     double total = rsOrder.getDouble("total_money");
                     String status = rsOrder.getString("status");
                     
-                    // Các thông tin chi tiết để truyền vào hàm xem
                     String address = rsOrder.getString("address");
                     String payment = rsOrder.getString("payment_method");
                     String note = rsOrder.getString("note");
 
-                    // Xác định màu badge
-                    String badgeClass = "status-pending";
-                    if ("Đang xử lý".equals(status)) badgeClass = "status-new";
-                    else if ("Đang vận chuyển".equals(status)) badgeClass = "status-shipping";
-                    else if ("Đã giao".equals(status)) badgeClass = "status-done";
-                    else if ("Đã hủy".equals(status)) badgeClass = "status-cancel";
-
-                    // Tạo dòng HTML
-                    html.append("<tr>");
-                    html.append("<td><strong>").append(userName).append("</strong></td>");
-                    html.append("<td>").append(date).append("</td>");
-                    html.append("<td style='color:#d35400; font-weight:bold;'>").append(String.format("%,.0f", total)).append(" đ</td>");
-                    html.append("<td><span class='status-badge ").append(badgeClass).append("'>").append(status).append("</span></td>");
-                    html.append("<td>");
-                    // Nút Xem
-                    html.append("<button class='btn-action btn-blue' onclick=\"viewOrderDetail('")
-                        .append(id).append("', '").append(address).append("', '").append(payment).append("', '").append(note).append("')\">Xem</button> ");
+                    // --- [SỬA 1] CẬP NHẬT LOGIC BADGE VỚI TRẠNG THÁI MỚI ---
+                    String badgeClass = "bg-secondary"; // Mặc định (Chờ thanh toán)
                     
-                    // Nút Duyệt / Hoàn tất
-                    if ("Đang xử lý".equals(status)) {
-                        html.append("<button class='btn-action btn-green' onclick=\"updateStatus('").append(id).append("', 'Đang vận chuyển')\">Duyệt</button>");
-                    } else if ("Đang vận chuyển".equals(status)) {
-                        html.append("<button class='btn-action btn-green' onclick=\"updateStatus('").append(id).append("', 'Đã giao')\">Hoàn tất</button>");
+                    if ("Đang xử lý".equals(status)) badgeClass = "status-new";
+                    else if ("Đang giao hàng".equals(status)) badgeClass = "status-shipping";
+                    else if ("Giao hàng thành công".equals(status)) badgeClass = "status-done"; 
+                    else if ("Đã hủy".equals(status)) badgeClass = "status-cancel";
+                    else if ("Chờ thanh toán".equals(status)) badgeClass = "status-waiting";
+
+                    // Tạo HTML dòng tr chuẩn Bootstrap
+                    html.append("<tr>");
+                    html.append("<td><strong>#").append(id).append("</strong></td>");
+                    html.append("<td class='fw-bold text-center'>").append(userName).append("</td>");
+                    html.append("<td>").append(date).append("</td>");
+                    html.append("<td class='fw-bold text-warning'>").append(String.format("%,.0f", total)).append(" đ</td>");
+                    html.append("<td><span class='badge rounded-pill ").append(badgeClass.replace("status-", "bg-").replace("new", "warning text-dark").replace("shipping", "primary").replace("done", "success").replace("cancel", "danger").replace("waiting", "secondary")).append("'>").append(status).append("</span></td>");
+                    html.append("<td><div class='d-flex justify-content-center gap-2'>");
+                    
+                    // Nút Xem
+                    html.append("<button class='btn btn-sm btn-info text-white fw-bold' onclick=\"viewOrderDetail('")
+                        .append(id).append("', '").append(address).append("', '").append(payment).append("', '").append(note).append("')\"><i class='fa-solid fa-eye'></i> Xem</button> ");
+                    
+                    // Nút Hành động
+                    if ("Chờ thanh toán".equals(status)) {} 
+                    else if ("Đang xử lý".equals(status)) {
+                        html.append("<button class='btn btn-sm btn-primary fw-bold' onclick=\"updateStatus('").append(id).append("', 'Đang giao hàng')\"><i class='fa-solid fa-truck-fast'></i> Giao hàng</button>");
+                    } 
+                    else if ("Đang giao hàng".equals(status)) {
+                        html.append("<button class='btn btn-sm btn-success fw-bold' onclick=\"updateStatus('").append(id).append("', 'Giao hàng thành công')\"><i class='fa-solid fa-check-circle'></i> Hoàn tất</button>");
                     }
-                    html.append("</td></tr>");
+                    html.append("</div></td></tr>");
                 }
                 
                 response.getWriter().write(html.toString());
-                return; // [QUAN TRỌNG] Dừng ngay để không load lại cả trang
+                return;
             }
 
             // --- 2. AJAX: LẤY CHI TIẾT MÓN ĂN CỦA BÀN ---
@@ -96,10 +100,7 @@ public class StaffServlet extends HttpServlet {
                 int tableId = Integer.parseInt(request.getParameter("tableId"));
                 response.setContentType("text/html;charset=UTF-8");
                 
-                String sql = "SELECT p.name, c.quantity, p.price, c.note " +
-                             "FROM cart_items c JOIN products p ON c.product_id = p.id " +
-                             "WHERE c.table_id = ?";
-                
+                String sql = "SELECT p.name, c.quantity, p.price, c.note FROM cart_items c JOIN products p ON c.product_id = p.id WHERE c.table_id = ?";
                 PreparedStatement ps = conn.prepareStatement(sql);
                 ps.setInt(1, tableId);
                 ResultSet rs = ps.executeQuery();
@@ -108,7 +109,6 @@ public class StaffServlet extends HttpServlet {
                 html.append("<table style='width:100%; font-size:14px; border-collapse: collapse;'>");
                 boolean hasItem = false;
                 double total = 0;
-                
                 while(rs.next()) {
                     hasItem = true;
                     String name = rs.getString("name");
@@ -127,36 +127,27 @@ public class StaffServlet extends HttpServlet {
                     html.append("</tr>");
                 }
                 html.append("</table>");
-                
-                if(!hasItem) {
-                    html.append("<p style='text-align:center; color:#888; margin:10px 0;'>Chưa có món nào.</p>");
-                } else {
-                    html.append("<div style='text-align:right; font-weight:bold; margin-top:10px; color:#d35400;'>Tổng: ").append(String.format("%,.0f", total)).append(" VNĐ</div>");
-                }
+                if(!hasItem) html.append("<p style='text-align:center; color:#888; margin:10px 0;'>Chưa có món nào.</p>");
+                else html.append("<div style='text-align:right; font-weight:bold; margin-top:10px; color:#d35400;'>Tổng: ").append(String.format("%,.0f", total)).append(" VNĐ</div>");
                 
                 response.getWriter().write(html.toString());
-                return; // [QUAN TRỌNG] Dừng ngay
+                return;
             }
 
-            // --- 3. UPDATE TRẠNG THÁI ĐƠN ONLINE ---
+            // --- 3. UPDATE TRẠNG THÁI ---
             if ("update_status".equals(action)) {
                 int orderId = Integer.parseInt(request.getParameter("orderId"));
                 String status = request.getParameter("status");
-                
                 String sql = "UPDATE orders SET status = ? WHERE id = ?";
                 PreparedStatement ps = conn.prepareStatement(sql);
                 ps.setString(1, status);
                 ps.setInt(2, orderId);
                 ps.executeUpdate();
-                
-                // Redirect về tab online
                 response.sendRedirect("staff?tab=online"); 
                 return;
             }
 
-            // --- 4. MẶC ĐỊNH: LOAD TRANG CHÍNH ---
-            
-            // Load danh sách Bàn
+            // --- 4. MẶC ĐỊNH: LOAD TRANG ---
             List<Table> tables = new ArrayList<>();
             String sqlTable = "SELECT * FROM tables";
             PreparedStatement psTable = conn.prepareStatement(sqlTable);
@@ -166,28 +157,20 @@ public class StaffServlet extends HttpServlet {
             }
             request.setAttribute("tables", tables);
 
-            // Load đơn hàng Online (Có lấy tên khách hàng)
             List<Order> onlineOrders = new ArrayList<>();
-            String sqlOrder = "SELECT o.*, u.name AS user_name " +
-                              "FROM orders o " +
-                              "JOIN users u ON o.user_email = u.email " +
-                              "WHERE o.order_type = 'online' " +
-                              "ORDER BY o.order_date DESC";
+            String sqlOrder = "SELECT o.*, u.name AS user_name FROM orders o JOIN users u ON o.user_email = u.email WHERE o.order_type = 'online' ORDER BY o.order_date DESC";
             PreparedStatement psOrder = conn.prepareStatement(sqlOrder);
             ResultSet rsOrder = psOrder.executeQuery();
             while (rsOrder.next()) {
                 Order order = new Order();
                 order.setId(rsOrder.getInt("id"));
-                order.setUserEmail(rsOrder.getString("user_name")); // Hiển thị Tên thay vì Email
+                order.setUserEmail(rsOrder.getString("user_name"));
                 order.setOrderDate(rsOrder.getTimestamp("order_date"));
                 order.setTotalPrice(rsOrder.getDouble("total_money"));
                 order.setStatus(rsOrder.getString("status"));
-                
-                // Set thêm thông tin chi tiết
                 order.setAddress(rsOrder.getString("address"));
                 order.setPaymentMethod(rsOrder.getString("payment_method"));
                 order.setNote(rsOrder.getString("note"));
-                
                 onlineOrders.add(order);
             }
             request.setAttribute("onlineOrders", onlineOrders);
@@ -203,26 +186,20 @@ public class StaffServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
         int tableId = Integer.parseInt(request.getParameter("tableId"));
-        
         HttpSession session = request.getSession();
         String staffEmail = (String) session.getAttribute("userEmail"); 
 
         try (Connection conn = DBConnection.getConnection()) {
             
             if ("open_table".equals(action)) {
-                // MỞ BÀN
                 String sql = "UPDATE tables SET status = 1 WHERE id = ?";
                 PreparedStatement ps = conn.prepareStatement(sql);
                 ps.setInt(1, tableId);
                 ps.executeUpdate();
-                
                 response.sendRedirect(request.getContextPath() + "/menu?tableId=" + tableId);
                 return;
             } 
             else if ("checkout_table".equals(action)) {
-                // THANH TOÁN & TRẢ BÀN
-                
-                // B1: Tính tổng tiền
                 double totalMoney = 0;
                 String sqlSum = "SELECT SUM(c.quantity * p.price) FROM cart_items c JOIN products p ON c.product_id = p.id WHERE c.table_id = ?";
                 PreparedStatement psSum = conn.prepareStatement(sqlSum);
@@ -231,37 +208,31 @@ public class StaffServlet extends HttpServlet {
                 if (rsSum.next()) totalMoney = rsSum.getDouble(1);
 
                 if (totalMoney > 0) {
-                    // B2: Lưu vào bảng ORDERS (Loại đơn: offline)
-                    String sqlOrder = "INSERT INTO orders (user_email, address, total_money, status, order_date, order_type, table_id) VALUES (?, ?, ?, 'Đã giao', NOW(), 'offline', ?)";
+                    // [SỬA 3] Cập nhật trạng thái khi thanh toán tại bàn: 'Giao hàng thành công'
+                    String sqlOrder = "INSERT INTO orders (user_email, address, total_money, status, order_date, order_type, table_id) VALUES (?, ?, ?, 'Giao hàng thành công', NOW(), 'offline', ?)";
                     PreparedStatement psOrder = conn.prepareStatement(sqlOrder, Statement.RETURN_GENERATED_KEYS);
-                    psOrder.setString(1, staffEmail); // Lưu người thực hiện thanh toán
+                    psOrder.setString(1, staffEmail);
                     psOrder.setString(2, "Tại bàn số " + tableId);
                     psOrder.setDouble(3, totalMoney);
                     psOrder.setInt(4, tableId);
                     psOrder.executeUpdate();
                     
-                    // Lấy ID đơn hàng
                     int orderId = 0;
                     ResultSet rsKey = psOrder.getGeneratedKeys();
                     if(rsKey.next()) orderId = rsKey.getInt(1);
 
-                    // B3: Lưu chi tiết đơn hàng
-                    String sqlDetail = "INSERT INTO order_details (order_id, product_name, price, quantity, image_url) " +
-                                       "SELECT ?, p.name, p.price, c.quantity, p.image_url " +
-                                       "FROM cart_items c JOIN products p ON c.product_id = p.id WHERE c.table_id = ?";
+                    String sqlDetail = "INSERT INTO order_details (order_id, product_name, price, quantity, image_url) SELECT ?, p.name, p.price, c.quantity, p.image_url FROM cart_items c JOIN products p ON c.product_id = p.id WHERE c.table_id = ?";
                     PreparedStatement psDetail = conn.prepareStatement(sqlDetail);
                     psDetail.setInt(1, orderId);
                     psDetail.setInt(2, tableId);
                     psDetail.executeUpdate();
                 }
 
-                // B4: Trả bàn về trạng thái trống
                 String sqlTable = "UPDATE tables SET status = 0 WHERE id = ?";
                 PreparedStatement psTable = conn.prepareStatement(sqlTable);
                 psTable.setInt(1, tableId);
                 psTable.executeUpdate();
 
-                // B5: Xóa giỏ hàng của bàn
                 String sqlClear = "DELETE FROM cart_items WHERE table_id = ?";
                 PreparedStatement psClear = conn.prepareStatement(sqlClear);
                 psClear.setInt(1, tableId);
@@ -270,7 +241,6 @@ public class StaffServlet extends HttpServlet {
                 response.sendRedirect("staff");
                 return;
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
