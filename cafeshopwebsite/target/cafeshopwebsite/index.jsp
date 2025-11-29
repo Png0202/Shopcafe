@@ -104,8 +104,7 @@
     <section class="py-5 bg-white">
         <div class="container py-4">
             <div class="text-center mb-5">
-                <h2 class="text-uppercase fw-bold" style="color: #6f4e37;">🔥 Món Best Seller</h2>
-                <p class="text-muted">Những món được khách hàng yêu thích nhất tại quán</p>
+                <h2 class="text-uppercase fw-bold" style="color: #6f4e37;">Những món được khách hàng yêu thích nhất tại quán</h2>
                 <div style="width: 80px; height: 4px; background: #d35400; margin: 0 auto;"></div>
             </div>
             
@@ -114,13 +113,6 @@
                 <div class="row align-items-center mb-5 g-5 ${status.index % 2 != 0 ? 'flex-lg-row-reverse' : ''}">
                     
                     <div class="col-lg-6 position-relative layer-image">
-                        <div class="rank-badge bg-warning text-dark fw-bold">
-                            <c:choose>
-                                <c:when test="${status.index == 0}"><i class="fa-solid fa-crown"></i> Top 1</c:when>
-                                <c:when test="${status.index == 1}"><i class="fa-solid fa-medal"></i> Top 2</c:when>
-                                <c:when test="${status.index == 2}"><i class="fa-solid fa-award"></i> Top 3</c:when>
-                            </c:choose>
-                        </div>
                         
                         <img src="${product.imageUrl}" alt="${product.name}" 
                              class="img-fluid rounded-4 shadow-lg w-100" 
