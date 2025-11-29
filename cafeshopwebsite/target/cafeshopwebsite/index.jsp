@@ -147,12 +147,7 @@
                 </c:if>
 
             </c:forEach>
-
-            <div class="text-center mt-5">
-                <a href="${pageContext.request.contextPath}/menu" class="btn btn-outline-secondary rounded-pill px-5 py-3 fw-bold">
-                    Xem Tất Cả Thực Đơn
-                </a>
-            </div>
+            
         </div>
     </section>
 
