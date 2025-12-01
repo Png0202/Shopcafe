@@ -8,13 +8,13 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.cafe.util.DBConnection;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.cafe.util.DBConnection;
 
 @WebServlet("/admin-chart")
 public class AdminChartServlet extends HttpServlet {
@@ -22,28 +22,26 @@ public class AdminChartServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         
-        // Cấu hình trả về JSON
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         
         String type = request.getParameter("type");   // "revenue" hoặc "order"
         String period = request.getParameter("period"); // "today", "week", "month", "year"
         
-        // Query SQL mặc định
         String sql = "";
         String selectPart = "";
-        String groupBy = "";
+        // Chỉ tính doanh thu cho đơn hàng thành công (cả online và offline)
+        String revenueCondition = " WHERE status IN ('Giao hàng thành công', 'Đã giao') "; 
+        String orderCondition = " WHERE status IN ('Giao hàng thành công', 'Đã giao') "; 
+
+        // 1. XÁC ĐỊNH LOẠI DỮ LIỆU
         String condition = "";
-        
-        // 1. XÁC ĐỊNH LOẠI DỮ LIỆU (DOANH THU HAY ĐƠN HÀNG)
         if ("revenue".equals(type)) {
-            // Doanh thu: Tính tổng tiền, chỉ tính đơn Đã giao
             selectPart = "SUM(total_money)";
-            condition = " WHERE status = 'Giao hàng thành công' ";
+            condition = revenueCondition;
         } else {
-            // Đơn hàng: Đếm số lượng, tính tất cả trạng thái
             selectPart = "COUNT(*)";
-            condition = " WHERE 1=1 "; 
+            condition = orderCondition;
         }
 
         // 2. XÂY DỰNG QUERY THEO THỜI GIAN
@@ -54,26 +52,25 @@ public class AdminChartServlet extends HttpServlet {
                   "GROUP BY HOUR(order_date) ORDER BY HOUR(order_date)";
                   
         } else if ("week".equals(period)) {
-            // 7 ngày gần nhất (Hiện Thứ/Ngày)
+            // 7 ngày gần nhất (Hiện ngày/tháng)
             sql = "SELECT DATE_FORMAT(order_date, '%d/%m') as label, " + selectPart + " as value " +
                   "FROM orders " + condition + " AND order_date >= DATE_SUB(NOW(), INTERVAL 7 DAY) " +
                   "GROUP BY DATE(order_date) ORDER BY order_date";
                   
         } else if ("month".equals(period)) {
-            // Các ngày trong tháng này
+            // Các ngày trong tháng hiện tại
             sql = "SELECT DATE_FORMAT(order_date, '%d') as label, " + selectPart + " as value " +
-                  "FROM orders " + condition + " AND MONTH(order_date) = MONTH(CURRENT_DATE()) AND YEAR(order_date) = YEAR(CURRENT_DATE()) " +
+                  "FROM orders " + condition + " AND MONTH(order_date) = MONTH(NOW()) AND YEAR(order_date) = YEAR(NOW()) " +
                   "GROUP BY DATE(order_date) ORDER BY order_date";
                   
         } else if ("year".equals(period)) {
             // 12 tháng trong năm nay
             sql = "SELECT CONCAT('Tháng ', MONTH(order_date)) as label, " + selectPart + " as value " +
-                  "FROM orders " + condition + " AND YEAR(order_date) = YEAR(CURRENT_DATE()) " +
+                  "FROM orders " + condition + " AND YEAR(order_date) = YEAR(NOW()) " +
                   "GROUP BY MONTH(order_date) ORDER BY MONTH(order_date)";
         }
 
-        // 3. THỰC THI VÀ TẠO JSON THỦ CÔNG
-        // (Để không cần thư viện Gson/Jackson, ta tự build chuỗi JSON)
+        // 3. THỰC THI VÀ TRẢ VỀ JSON
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             
@@ -83,11 +80,10 @@ public class AdminChartServlet extends HttpServlet {
             List<Double> data = new ArrayList<>();
             
             while (rs.next()) {
-                labels.add("\"" + rs.getString("label") + "\""); // Thêm dấu ngoặc kép cho chuỗi JSON
+                labels.add("\"" + rs.getString("label") + "\"");
                 data.add(rs.getDouble("value"));
             }
             
-            // Build JSON String: { "labels": ["A", "B"], "data": [10, 20] }
             StringBuilder json = new StringBuilder();
             json.append("{");
             json.append("\"labels\": ").append(labels.toString()).append(",");

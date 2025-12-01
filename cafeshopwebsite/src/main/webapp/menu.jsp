@@ -106,11 +106,11 @@
             <div class="container d-flex justify-content-between align-items-center">
                 <h5 class="m-0"><i class="fa-solid fa-utensils me-2"></i>ĐANG GỌI MÓN CHO BÀN SỐ ${sessionScope.currentTableId}</h5>
                 <div>
-                    <a href="${pageContext.request.contextPath}/cart" class="btn btn-light btn-sm text-success fw-bold me-2 " style="color: white;">
-                        <i class="fa-solid fa-cart-shopping"></i> Xem Giỏ Bàn Này
+                    <a href="${pageContext.request.contextPath}/cart" class="btn btn-outline-light btn-sm fw-bold me-2">
+                        <i class="fa-solid fa-cart-shopping"></i> Xem Order Bàn Này
                     </a>
                     <a href="${pageContext.request.contextPath}/staff" class="btn btn-outline-light btn-sm">
-                        <i class="fa-solid fa-arrow-left"></i> Sơ Đồ
+                        <i class="fa-solid fa-arrow-left"></i> Trang Nhân Viên
                     </a>
                 </div>
             </div>

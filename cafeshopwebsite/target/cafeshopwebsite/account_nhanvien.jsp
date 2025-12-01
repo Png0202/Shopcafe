@@ -122,6 +122,16 @@
             }
             
         }
+        /* --- RESPONSIVE CHO MOBILE & TABLET --- */
+        @media (max-width: 768px) {
+
+            /* Tinh chỉnh nút Thêm Món nhỏ lại */
+            .btn-add-mobile {
+                padding: 5px 10px !important; /* Giảm độ dày nút */
+                font-size: 12px !important;   /* Giảm cỡ chữ */
+                white-space: nowrap;          /* Không cho xuống dòng */
+            }
+        }
     </style>
 </head>
 <body>
@@ -135,6 +145,9 @@
                 </li>
                 <li class="nav-item">
                     <a onclick="showTab('online')" id="link-online" class="nav-link"><i class="fa-solid fa-globe me-2"></i>Đơn Online</a>
+                </li>
+                <li class="nav-item">
+                    <a onclick="showTab('menu')" id="link-menu" class="nav-link"><i class="fa-solid fa-book-open me-2"></i>Quản Lý Menu</a>
                 </li>
                 <li class="nav-item">
                     <a href="${pageContext.request.contextPath}/logout.jsp" class="nav-link bg-danger text-white ms-3"><i class="fa-solid fa-right-from-bracket me-2"></i>Đăng Xuất</a>
@@ -232,6 +245,59 @@
             </div>
         </div>
 
+        <div id="tab-menu" class="tab-content-section">
+            <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+                <h4 class="border-start border-5 border-success ps-3 text-uppercase fw-bold text-dark m-0">Danh Sách Món</h4>
+                <button class="btn btn-success fw-bold btn-add-mobile" onclick="openProductModal()">
+                    <i class="fa-solid fa-plus me-2"></i>Thêm Món Mới
+                </button>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Hình ảnh</th>
+                                    <th>Tên món</th>
+                                    <th>Danh mục</th>
+                                    <th>Giá</th>
+                                    <th class="text-center">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <c:forEach var="p" items="${productList}">
+                                    <tr>
+                                        <td>
+                                            <img src="${p.imageUrl}" alt="${p.name}" 
+                                                 style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;"
+                                                 onerror="this.src='https://placehold.co/50x50'">
+                                        </td>
+                                        <td class="fw-bold">${p.name}</td>
+                                        <td><span class="badge bg-secondary">${p.category}</span></td>
+                                        <td class="text-danger fw-bold"><fmt:formatNumber value="${p.price}" pattern="#,###"/> đ</td>
+                                        <td class="text-center">
+                                            <button class="btn btn-sm btn-warning me-2" 
+                                                    onclick="editProduct('${p.id}', '${p.name}', '${p.description}', '${p.price}', '${p.category}', '${p.imageUrl}')">
+                                                <i class="fa-solid fa-pen"></i>
+                                            </button>
+                                            
+                                            <form action="staff" method="post" class="d-inline" onsubmit="return confirm('Bạn chắc chắn muốn xóa món này?');">
+                                                <input type="hidden" name="action" value="delete_product">
+                                                <input type="hidden" name="id" value="${p.id}">
+                                                <button class="btn btn-sm btn-danger"><i class="fa-solid fa-trash"></i></button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                </c:forEach>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <div class="modal fade" id="tableModal" tabindex="-1" aria-hidden="true">
@@ -239,7 +305,6 @@
             <div class="modal-content">
                 <div class="modal-header bg-light">
                     <h5 class="modal-title fw-bold text-warning" id="modalTableTitle">Xử Lý Bàn</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     
@@ -286,13 +351,59 @@
         </div>
     </div>
 
+    <div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title fw-bold" id="productModalTitle">Thêm Món Mới</h5></div>
+                <div class="modal-body">
+                    <form action="staff" method="post" id="productForm">
+                        <input type="hidden" name="action" id="formAction" value="add_product">
+                        <input type="hidden" name="id" id="prodId">
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Tên món</label>
+                            <input type="text" name="name" id="prodName" class="form-control" required>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label fw-bold">Giá tiền</label>
+                                <input type="number" name="price" id="prodPrice" class="form-control" required>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label fw-bold">Danh mục</label>
+                                <select name="category" id="prodCategory" class="form-select">
+                                    <option value="Cà Phê">Cà Phê</option>
+                                    <option value="Trà">Trà</option>
+                                    <option value="Bánh">Bánh & Snack</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Link Hình Ảnh</label>
+                            <input type="text" name="image_url" id="prodImg" class="form-control" placeholder="https://...">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Mô tả</label>
+                            <textarea name="description" id="prodDesc" class="form-control" rows="2"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100 fw-bold">LƯU SẢN PHẨM</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade" id="orderDetailModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-info text-white">
                     <h5 class="modal-title fw-bold">Chi Tiết Đơn Hàng #<span id="modalOrderId"></span></h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
+                    </div>
                 <div class="modal-body">
                     <div class="bg-light p-3 rounded mb-3">
                         <p class="mb-1"><strong><i class="fa-solid fa-location-dot text-danger"></i> Địa chỉ:</strong> <span id="modalAddress"></span></p>
@@ -418,6 +529,41 @@
             if (urlParams.get('tab') === 'online') {
                 showTab('online');
             }
+        });
+        // --- QUẢN LÝ MENU ---
+        const productModal = new bootstrap.Modal(document.getElementById('productModal'));
+
+        function openProductModal() {
+            // Reset form để thêm mới
+            document.getElementById('productForm').reset();
+            document.getElementById('formAction').value = 'add_product';
+            document.getElementById('productModalTitle').innerText = 'Thêm Món Mới';
+            productModal.show();
+        }
+
+        function editProduct(id, name, desc, price, cat, img) {
+            // Điền dữ liệu để sửa
+            document.getElementById('formAction').value = 'edit_product';
+            document.getElementById('productModalTitle').innerText = 'Cập Nhật Món';
+            
+            document.getElementById('prodId').value = id;
+            document.getElementById('prodName').value = name;
+            document.getElementById('prodDesc').value = desc;
+            document.getElementById('prodPrice').value = price;
+            document.getElementById('prodCategory').value = cat;
+            document.getElementById('prodImg').value = img;
+            
+            productModal.show();
+        }
+
+        // Cập nhật lại logic mở tab từ URL
+        document.addEventListener("DOMContentLoaded", function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const activeTab = urlParams.get('tab');
+            
+            if (activeTab === 'online') showTab('online');
+            else if (activeTab === 'menu') showTab('menu'); // Thêm dòng này
+            else showTab('pos');
         });
     </script>
 </body>

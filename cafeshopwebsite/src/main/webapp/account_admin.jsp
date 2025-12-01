@@ -17,29 +17,14 @@
         body { background-color: #f8f9fa; }
         
         /* Navbar Styles */
-        .navbar-admin {
-            background-color: #212529;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
+        .navbar-admin { background-color: #212529; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         
         .navbar-nav .nav-link {
-            cursor: pointer;
-            color: rgba(255,255,255,0.7);
-            font-weight: 500;
-            padding: 10px 15px;
-            transition: 0.3s;
-            border-radius: 5px;
-            margin-left: 5px;
+            cursor: pointer; color: rgba(255,255,255,0.7); font-weight: 500;
+            padding: 10px 15px; transition: 0.3s; border-radius: 5px; margin-left: 5px;
         }
-        .navbar-nav .nav-link:hover {
-            color: #fff;
-            background-color: rgba(255,255,255,0.1);
-        }
-        .navbar-nav .nav-link.active {
-            color: #fff !important;
-            background-color: #d35400; /* Màu cam chủ đạo */
-            font-weight: bold;
-        }
+        .navbar-nav .nav-link:hover { color: #fff; background-color: rgba(255,255,255,0.1); }
+        .navbar-nav .nav-link.active { color: #fff !important; background-color: #d35400; font-weight: bold; }
         
         /* Cards Thống kê */
         .stat-card {
@@ -67,11 +52,9 @@
             <a class="navbar-brand fw-bold text-warning" href="#">
                 <i class="fa-solid fa-mug-hot me-2"></i>ADMIN CP
             </a>
-            
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNavbar">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            
             <div class="collapse navbar-collapse" id="adminNavbar">
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
                     <li class="nav-item">
@@ -180,7 +163,7 @@
                 <div class="col-md-6">
                     <div class="card stat-card bg-warning text-dark shadow-sm">
                         <div class="card-body">
-                            <h5 class="card-title">Tổng Doanh Thu (Đã giao)</h5>
+                            <h5 class="card-title">Tổng Doanh Thu</h5>
                             <h2 class="mb-0 fw-bold"><fmt:formatNumber value="${totalRevenue}" pattern="#,###"/> VNĐ</h2>
                             <i class="fa-solid fa-money-bill-wave stat-icon text-dark"></i>
                         </div>
@@ -222,11 +205,45 @@
                                 <option value="today">Hôm nay</option>
                                 <option value="week" selected>7 Ngày qua</option>
                                 <option value="month">Tháng này</option>
+                                <option value="year">Năm nay</option>
                             </select>
                         </div>
                         <div class="card-body">
                             <canvas id="orderChart"></canvas>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0 mt-4">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                    <h5 class="m-0 fw-bold text-secondary"><i class="fa-solid fa-table me-2"></i>Báo Cáo Chi Tiết</h5>
+                    
+                    <div class="btn-group" role="group">
+                        <input type="radio" class="btn-check" name="reportType" id="btnRadioDay" autocomplete="off" checked onclick="loadReport('day')">
+                        <label class="btn btn-outline-secondary btn-sm" for="btnRadioDay">Theo Ngày</label>
+                      
+                        <input type="radio" class="btn-check" name="reportType" id="btnRadioMonth" autocomplete="off" onclick="loadReport('month')">
+                        <label class="btn btn-outline-secondary btn-sm" for="btnRadioMonth">Theo Tháng</label>
+                      
+                        <input type="radio" class="btn-check" name="reportType" id="btnRadioYear" autocomplete="off" onclick="loadReport('year')">
+                        <label class="btn btn-outline-secondary btn-sm" for="btnRadioYear">Theo Năm</label>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Thời Gian</th>
+                                    <th class="text-center">Tổng Đơn Hàng</th>
+                                    <th class="text-end">Doanh Thu Thực</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reportTableBody">
+                                <tr><td colspan="3" class="text-center py-3"><div class="spinner-border spinner-border-sm text-warning"></div> Đang tải...</td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -284,10 +301,11 @@
     <script>
         // --- 1. XỬ LÝ CHUYỂN TAB ---
         function showTab(tabName) {
+            // Ẩn tất cả
             document.querySelectorAll('.tab-content-section').forEach(el => el.classList.remove('active-section'));
             document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
             
-            // Hiện tab được chọn
+            // Hiện cái được chọn
             document.getElementById('tab-' + tabName).classList.add('active-section');
             document.getElementById('link-' + tabName).classList.add('active');
         }
@@ -344,7 +362,7 @@
             options: { responsive: true, plugins: { legend: { display: false } } }
         });
 
-        // --- 4. HÀM CẬP NHẬT BIỂU ĐỒ ---
+        // --- 4. HÀM CẬP NHẬT BIỂU ĐỒ & BÁO CÁO ---
         function updateRevenueChart(period) {
             fetch('${pageContext.request.contextPath}/admin-chart?type=revenue&period=' + period)
                 .then(response => response.json())
@@ -352,7 +370,8 @@
                     revenueChart.data.labels = (jsonData.labels.length === 0) ? ["Không có dữ liệu"] : jsonData.labels;
                     revenueChart.data.datasets[0].data = (jsonData.labels.length === 0) ? [0] : jsonData.data;
                     revenueChart.update();
-                });
+                })
+                .catch(error => console.error('Lỗi chart revenue:', error));
         }
 
         function updateOrderChart(period) {
@@ -362,26 +381,39 @@
                     orderChart.data.labels = (jsonData.labels.length === 0) ? ["Không có dữ liệu"] : jsonData.labels;
                     orderChart.data.datasets[0].data = (jsonData.labels.length === 0) ? [0] : jsonData.data;
                     orderChart.update();
+                })
+                .catch(error => console.error('Lỗi chart order:', error));
+        }
+        
+        // --- 5. LOAD BÁO CÁO DẠNG BẢNG ---
+        function loadReport(type) {
+            const tbody = document.getElementById('reportTableBody');
+            tbody.innerHTML = '<tr><td colspan="3" class="text-center py-3"><div class="spinner-border spinner-border-sm text-secondary"></div> Đang tải dữ liệu...</td></tr>';
+            
+            fetch('${pageContext.request.contextPath}/admin?action=get_report&type=' + type)
+                .then(res => res.text())
+                .then(html => { tbody.innerHTML = html; })
+                .catch(err => {
+                    console.error(err);
+                    tbody.innerHTML = '<tr><td colspan="3" class="text-center text-danger">Lỗi tải dữ liệu</td></tr>';
                 });
         }
 
+        // --- INIT ---
         window.addEventListener('load', function() {
             updateRevenueChart('week');
             updateOrderChart('week');
+            loadReport('day'); // Mặc định load báo cáo ngày
         });
-        
-        // --- 5. TỰ ĐỘNG ĐÓNG MENU TRÊN MOBILE KHI CHỌN TAB ---
+
+        // --- TỰ ĐỘNG ĐÓNG MENU TRÊN MOBILE KHI CHỌN TAB ---
         const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
         const navbarCollapse = document.getElementById('adminNavbar');
-
         navLinks.forEach(link => {
             link.addEventListener('click', () => {
-                // Kiểm tra nếu menu đang mở (có class 'show') thì đóng lại
                 if (navbarCollapse.classList.contains('show')) {
                     const bsCollapse = bootstrap.Collapse.getInstance(navbarCollapse);
-                    if (bsCollapse) {
-                        bsCollapse.hide();
-                    }
+                    if (bsCollapse) { bsCollapse.hide(); }
                 }
             });
         });
