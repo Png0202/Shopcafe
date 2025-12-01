@@ -105,7 +105,7 @@
                             <i class="fa-solid fa-user me-2"></i> Thông tin tài khoản
                         </a>
                         <a onclick="showTab('addresses')" id="nav-addresses" class="list-group-item list-group-item-action">
-                            <i class="fa-solid fa-location-dot me-2"></i> Sổ địa chỉ (${empty requestScope.addressCount ? 0 : requestScope.addressCount})
+                            <i class="fa-solid fa-location-dot me-2"></i>Quản lý địa chỉ (${empty requestScope.addressCount ? 0 : requestScope.addressCount})
                         </a>
                         <a onclick="showTab('orders')" id="nav-orders" class="list-group-item list-group-item-action">
                             <i class="fa-solid fa-box me-2"></i> Đơn hàng của bạn

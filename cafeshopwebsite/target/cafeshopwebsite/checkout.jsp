@@ -7,45 +7,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thanh Toán - Quán Cà Phê</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+    
     <style>
-    /* --- CSS CHO Ô CHỌN ĐỊA CHỈ (CUSTOM SELECT) --- */
-        .custom-select {
-            width: 100%;
-            height: 55px;
-            padding: 10px 30px 10px 10px; /* Padding phải lớn hơn để tránh đè lên mũi tên */
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background-color: #fff;
-            font-family: inherit;
-            font-size: 14px;
-            color: #333;
-            cursor: pointer;
-            
-            /* Xử lý khi chữ quá dài */
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            
-            /* Xóa style mặc định */
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            
-            /* Mũi tên tùy chỉnh */
-            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
-            background-repeat: no-repeat;
-            background-position: right 10px top 50%;
-            background-size: 12px auto;
+        body { background-color: #f8f9fa; }
+        
+        /* Tinh chỉnh form cho đẹp hơn */
+        .form-label { font-weight: 600; color: #555; }
+        .form-control:focus, .form-select:focus {
+            border-color: #d35400;
+            box-shadow: 0 0 0 0.25rem rgba(211, 84, 0, 0.25);
         }
         
-        /* Style cho Option bên trong (khi xổ xuống) */
-        .custom-select option {
-            padding: 10px;
-            font-size: 14px;
-            /* Giới hạn độ rộng option */
-            max-width: 100%; 
-            white-space: pre-wrap; /* Cho phép xuống dòng nếu cần thiết trong dropdown */
+        /* Card tóm tắt đơn hàng */
+        .summary-card {
+            position: sticky;
+            top: 20px; /* Dính khi cuộn trên PC */
+            border: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        
+        .marquee-content { display: inline-block; padding-left: 100%; animation: marquee 15s linear infinite; }
+        @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
+
+        /* Responsive Mobile */
+        @media (max-width: 992px) {
+            .summary-card { position: static; margin-top: 20px; } /* Bỏ dính trên mobile */
         }
     </style>
 </head>
@@ -57,10 +48,20 @@
                 <ul>
                     <li><a href="${pageContext.request.contextPath}/home">Trang Chủ</a></li>
                     <li><a href="${pageContext.request.contextPath}/menu">Thực Đơn</a></li>
-                    <li><a href="${pageContext.request.contextPath}/cart">Giỏ Hàng</a></li>
                     <c:choose>
                         <c:when test="${not empty sessionScope.userEmail}">
-                            <li><a href="${pageContext.request.contextPath}/profile" style="font-weight: bold; color: #d35400;">Tài Khoản (${sessionScope.userName})</a></li>
+                            <c:choose>
+                                <c:when test="${sessionScope.permission == 0}">
+                                    <li><a href="${pageContext.request.contextPath}/admin" style="color:red;font-weight:bold;">QUẢN TRỊ</a></li>
+                                </c:when>
+                                <c:when test="${sessionScope.permission == 1}">
+                                    <li><a href="${pageContext.request.contextPath}/staff" style="color:blue;font-weight:bold;">NHÂN VIÊN</a></li>
+                                </c:when>
+                                <c:otherwise>
+                                    <li><a href="${pageContext.request.contextPath}/cart">Giỏ Hàng</a></li>
+                                    <li><a href="${pageContext.request.contextPath}/profile" style="font-weight: bold; color: #d35400;">Tài Khoản (${sessionScope.userName})</a></li>
+                                </c:otherwise>
+                            </c:choose>
                         </c:when>
                         <c:otherwise>
                             <li><a href="${pageContext.request.contextPath}/login.jsp">Đăng Nhập</a></li>
@@ -71,141 +72,149 @@
         </div>
     </header>
 
-    <section class="cart-section">
+    <div class="container mt-3">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="home" class="text-decoration-none text-secondary">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a href="cart" class="text-decoration-none text-secondary">Giỏ hàng</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Thanh toán</li>
+            </ol>
+        </nav>
+    </div>
+
+    <section class="py-4">
         <div class="container">
-            <h2 class="section-title">Thanh Toán</h2>
+            <h2 class="text-center mb-4 text-uppercase fw-bold" style="color: #6f4e37;">Thanh Toán Đơn Hàng</h2>
             
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem;">
-                
-                <%-- PHẦN 1: FORM THÔNG TIN --%>
-                <div class="form-container" style="margin: 0;">
-                    <h3 style="color: var(--primary-color); margin-bottom: 1.5rem;">Thông Tin Khách Hàng</h3>
+            <form action="checkout" method="post" id="checkoutForm">
+                <div class="row g-4">
                     
-                    <%-- ID checkoutForm dùng để liên kết với nút Submit ở cột bên phải --%>
-                    <form action="checkout" method="post" id="checkoutForm">
-                        <div class="form-group">
-                            <label>Họ và Tên</label>
-                            <input type="text" name="customerName" value="${requestScope.customerName}" readonly style="background: #eee;">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Số Điện Thoại</label>
-                            <input type="tel" name="phone" value="${requestScope.customerPhone}" readonly style="background: #eee;">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Email</label>
-                            <input type="email" value="${sessionScope.userEmail}" readonly style="background: #eee;">
-                        </div>
-                        
-                        <%-- PHẦN CHỌN ĐỊA CHỈ MỚI --%>
-                        <div class="form-group">
-                            <label>Địa Chỉ Giao Hàng <span style="color: red;">*</span></label>
-                            
-                            <c:choose>
-                                <%-- Nếu chưa có địa chỉ nào -> Hiện ô nhập tay --%>
-                                <c:when test="${empty requestScope.listAddresses}">
-                                    <textarea name="address" rows="3" required class="info-control" placeholder="Bạn chưa có địa chỉ lưu sẵn..."></textarea>
-                                    <div style="margin-top: 5px; font-size: 12px;">
-                                        <a href="${pageContext.request.contextPath}/profile?tab=addresses" target="_blank" style="color: #d35400;">+ Thêm địa chỉ mới</a>
-                                    </div>
-                                </c:when>
-                                
-                                <%-- Nếu đã có địa chỉ -> Hiện danh sách chọn --%>
-                                <c:otherwise>
-                                    <select name="address" id="addressSelect" required class="custom-select" onchange="previewAddress(this)">
-                                        <c:forEach var="addr" items="${requestScope.listAddresses}">
-                                            <%-- 
-                                                Logic cắt chuỗi thông minh: 
-                                                - Chỉ cắt hiển thị trong ô select (label)
-                                                - Giá trị thực (value) vẫn giữ nguyên đầy đủ để gửi đi 
-                                            --%>
-                                            <option value="${addr}">
-                                                <c:choose>
-                                                    <c:when test="${addr.length() > 60}">
-                                                        ${addr.substring(0, 60)}...
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        ${addr}
-                                                    </c:otherwise>
-                                                </c:choose>
-                                            </option>
-                                        </c:forEach>
-                                    </select>
-
-                                    <div id="addressMarquee" class="marquee-container">
-                                        <span id="marqueeText" class="marquee-content"></span>
-                                    </div>
-
-                                    <div style="margin-top: 8px; text-align: right;">
-                                        <a href="${pageContext.request.contextPath}/profile?tab=addresses" target="_blank" style="font-size: 13px; color: #d35400; text-decoration: none;">
-                                            ⚙ Quản lý sổ địa chỉ
-                                        </a>
-                                    </div>
-                                </c:otherwise>
-                            </c:choose>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Phương Thức Thanh Toán <span style="color: red;">*</span></label>
-                            <select name="paymentMethod" required class="custom-select">
-                                <option value="cash">Tiền Mặt (COD)</option>
-                                <option value="banking">Chuyển Khoản Ngân Hàng</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Ghi Chú</label>
-                            <textarea name="notes" rows="3" placeholder="Ghi chú cho đơn hàng (nếu có)"></textarea>
-                        </div>
-                        
-                        <a href="${pageContext.request.contextPath}/cart" class="btn btn-secondary" style="width: 100%; text-align: center; display: block;">← Quay Lại Giỏ Hàng</a>
-                    </form>
-                </div>
-        
-                <%-- PHẦN 2: TÓM TẮT ĐƠN HÀNG --%>
-                <div>
-                    <div class="cart-summary">
-                        <h3>Tóm Tắt Đơn Hàng</h3>
-                        
-                        <div id="order-summary" style="margin: 1.5rem 0; max-height: 300px; overflow-y: auto;">
-                            <c:forEach var="item" items="${requestScope.cartItems}">
-                                <div style="display: flex; justify-content: space-between; padding: 0.8rem 0; border-bottom: 1px solid #eee;">
-                                    <div>
-                                        <strong>${item.productName}</strong>
-                                        <div style="color: #666; font-size: 0.9rem;">
-                                            <fmt:formatNumber value="${item.price}" pattern="#,###"/> VNĐ × ${item.quantity}
+                    <%-- CỘT TRÁI: THÔNG TIN GIAO HÀNG --%>
+                    <div class="col-lg-7">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-white border-bottom py-3">
+                                <h5 class="m-0 fw-bold text-primary"><i class="fa-solid fa-address-card me-2"></i>Thông Tin Giao Hàng</h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Họ và Tên</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light"><i class="fa-solid fa-user"></i></span>
+                                            <input type="text" class="form-control bg-light" value="${requestScope.customerName}" readonly>
                                         </div>
                                     </div>
-                                    <div style="font-weight: bold;">
-                                        <fmt:formatNumber value="${item.totalPrice}" pattern="#,###"/> VNĐ
+                                    <div class="col-md-6">
+                                        <label class="form-label">Số Điện Thoại</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light"><i class="fa-solid fa-phone"></i></span>
+                                            <input type="text" class="form-control bg-light" value="${requestScope.customerPhone}" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label">Email</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light"><i class="fa-solid fa-envelope"></i></span>
+                                            <input type="text" class="form-control bg-light" value="${sessionScope.userEmail}" readonly>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-12">
+                                        <label class="form-label text-danger">Địa Chỉ Nhận Hàng *</label>
+                                        <c:choose>
+                                            <c:when test="${empty requestScope.listAddresses}">
+                                                <textarea name="address" rows="3" class="form-control" required placeholder="Vui lòng nhập địa chỉ..."></textarea>
+                                                <div class="form-text"><a href="${pageContext.request.contextPath}/profile?tab=addresses" target="_blank" class="text-decoration-none">+ Thêm địa chỉ mới</a></div>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <select name="address" id="addressSelect" class="form-select" required onchange="previewAddress(this)">
+                                                    <c:forEach var="addr" items="${requestScope.listAddresses}">
+                                                        <option value="${addr}">
+                                                            ${addr.length() > 60 ? addr.substring(0, 60).concat("...") : addr}
+                                                        </option>
+                                                    </c:forEach>
+                                                </select>
+                                                <div id="addressMarquee" class="marquee-container">
+                                                    <span id="marqueeText" class="marquee-content"></span>
+                                                </div>
+                                                <div class="form-text text-end"><a href="${pageContext.request.contextPath}/profile?tab=addresses" target="_blank" class="text-decoration-none">Quản lý địa chỉ</a></div>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <label class="form-label text-danger">Phương Thức Thanh Toán *</label>
+                                        <div class="form-check p-3 border rounded mb-2">
+                                            <input class="form-check-input" type="radio" name="paymentMethod" id="payCash" value="cash" checked>
+                                            <label class="form-check-label w-100" for="payCash">
+                                                <i class="fa-solid fa-money-bill-1 me-2 text-success"></i>Tiền Mặt (COD)
+                                            </label>
+                                        </div>
+                                        <div class="form-check p-3 border rounded">
+                                            <input class="form-check-input" type="radio" name="paymentMethod" id="payBank" value="banking">
+                                            <label class="form-check-label w-100" for="payBank">
+                                                <i class="fa-solid fa-building-columns me-2 text-primary"></i>Chuyển Khoản Ngân Hàng (QR Code)
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <label class="form-label">Ghi Chú Đơn Hàng</label>
+                                        <textarea name="notes" rows="2" class="form-control" placeholder="Ví dụ: Ít đường, nhiều đá..."></textarea>
                                     </div>
                                 </div>
-                            </c:forEach>
-                        </div>
-                        
-                        <div style="border-top: 1px solid #ddd; padding-top: 1rem; margin-top: 1rem;">
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                                <span>Tạm tính:</span>
-                                <span><fmt:formatNumber value="${requestScope.subTotal}" pattern="#,###"/> VNĐ</span>
+                                
+                                <div class="mt-4">
+                                    <a href="${pageContext.request.contextPath}/cart" class="btn btn-outline-secondary">
+                                        <i class="fa-solid fa-arrow-left me-2"></i>Quay Lại Giỏ Hàng
+                                    </a>
+                                </div>
                             </div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                                <span>Phí vận chuyển:</span>
-                                <span><fmt:formatNumber value="${requestScope.shippingFee}" pattern="#,###"/> VNĐ</span>
-                            </div>
-                            <div class="cart-total">
-                                <span>Tổng cộng:</span>
-                                <span style="color: #d35400;"><fmt:formatNumber value="${requestScope.finalTotal}" pattern="#,###"/> VNĐ</span>
-                            </div>
-                        </div>
-                        
-                        <div style="margin-top: 1.5rem;">
-                            <%-- Nút Submit nằm ngoài form nhưng có attribute form="checkoutForm" để liên kết --%>
-                            <button type="submit" form="checkoutForm" class="btn" style="width: 100%; padding: 1rem; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;" onclick="return confirm('Xác nhận đặt hàng?');">Xác Nhận Đặt Hàng</button>
                         </div>
                     </div>
+
+                    <%-- CỘT PHẢI: TÓM TẮT ĐƠN HÀNG --%>
+                    <div class="col-lg-5">
+                        <div class="card summary-card">
+                            <div class="card-header bg-white border-bottom py-3">
+                                <h5 class="m-0 fw-bold text-secondary"><i class="fa-solid fa-receipt me-2"></i>Tóm Tắt Đơn Hàng</h5>
+                            </div>
+                            <div class="card-body p-0">
+                                <ul class="list-group list-group-flush" style="max-height: 300px; overflow-y: auto;">
+                                    <c:forEach var="item" items="${requestScope.cartItems}">
+                                        <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                            <div>
+                                                <h6 class="my-0 fw-bold">${item.productName}</h6>
+                                                <small class="text-muted"><fmt:formatNumber value="${item.price}" pattern="#,###"/> ₫ x ${item.quantity}</small>
+                                            </div>
+                                            <span class="text-dark fw-bold"><fmt:formatNumber value="${item.totalPrice}" pattern="#,###"/> ₫</span>
+                                        </li>
+                                    </c:forEach>
+                                </ul>
+                            </div>
+                            <div class="card-footer bg-light p-4">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">Tạm tính</span>
+                                    <strong><fmt:formatNumber value="${requestScope.subTotal}" pattern="#,###"/> ₫</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
+                                    <span class="text-muted">Phí vận chuyển</span>
+                                    <strong><fmt:formatNumber value="${requestScope.shippingFee}" pattern="#,###"/> ₫</strong>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <span class="h5 mb-0">Tổng cộng</span>
+                                    <span class="h4 mb-0 text-danger fw-bold"><fmt:formatNumber value="${requestScope.finalTotal}" pattern="#,###"/> ₫</span>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-success w-100 py-3 fw-bold text-uppercase shadow" onclick="return confirm('Xác nhận đặt hàng?');">
+                                    Xác Nhận Đặt Hàng <i class="fa-solid fa-check ms-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
                 </div>
-            </div>
+            </form>
         </div>
     </section>
 
@@ -216,9 +225,9 @@
         </div>
     </footer>
 
-    <%-- Script xử lý Marquee và Responsive --%>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
-        // Hàm hiển thị chữ chạy khi chọn địa chỉ
         function previewAddress(selectElement) {
             const selectedAddress = selectElement.value;
             const marqueeContainer = document.getElementById('addressMarquee');
@@ -232,22 +241,9 @@
             }
         }
 
-        // Chạy khi load trang
         window.addEventListener('load', function() {
-            // Xử lý Responsive
-            const container = document.querySelector('.cart-section .container > div');
-            const handleResize = () => {
-                if (window.innerWidth <= 768) container.style.gridTemplateColumns = '1fr';
-                else container.style.gridTemplateColumns = '1fr 1fr';
-            };
-            window.addEventListener('resize', handleResize);
-            handleResize();
-
-            // Khởi tạo preview địa chỉ mặc định
             const addrSelect = document.getElementById('addressSelect');
-            if (addrSelect) {
-                previewAddress(addrSelect);
-            }
+            if (addrSelect) { previewAddress(addrSelect); }
         });
     </script>
 </body>

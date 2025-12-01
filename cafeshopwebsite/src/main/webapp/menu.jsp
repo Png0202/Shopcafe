@@ -32,11 +32,17 @@
             color: #d35400;
         }
         
-        .filter-btn.btn-outline-custom:hover {
+        .filter-btn:not(.active):hover { 
             background: #fdf2e9;
             transform: translateY(-2px);
         }
-
+        .filter-btn.active:hover {
+            background: linear-gradient(45deg, #d35400, #e67e22);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 10px rgba(211, 84, 0, 0.3);
+            transform: translateY(-2px); /* Thêm nảy lên */
+        }
         /* Trạng thái đang chọn */
         .filter-btn.active {
             background: linear-gradient(45deg, #d35400, #e67e22);
@@ -94,22 +100,29 @@
             background-color: #5a3e2b;
             color: white;
         }
+        .btn:hover {
+            background-color: #f3867fff;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        
     </style>
 </head>
 <body>
     
     <%-- 
-       1. THANH TRẠNG THÁI POS (MÀU XANH)
+       1. THANH TRẠNG THÁI POS (MÀU ĐỎ - ĐÃ SỬA)
     --%>
     <c:if test="${not empty sessionScope.currentTableId}">
-        <div class="bg-success text-white py-2 sticky-top shadow-sm">
+        <div class="bg-danger text-white py-2 sticky-top shadow-sm">
             <div class="container d-flex justify-content-between align-items-center">
                 <h5 class="m-0"><i class="fa-solid fa-utensils me-2"></i>ĐANG GỌI MÓN CHO BÀN SỐ ${sessionScope.currentTableId}</h5>
                 <div>
-                    <a href="${pageContext.request.contextPath}/cart" class="btn btn-outline-light btn-sm fw-bold me-2">
+                    <a href="${pageContext.request.contextPath}/cart" class="btn btn-outline-light btn-sm fw-bold me-2" style="min-width: 180px;">
                         <i class="fa-solid fa-cart-shopping"></i> Xem Order Bàn Này
                     </a>
-                    <a href="${pageContext.request.contextPath}/staff" class="btn btn-outline-light btn-sm">
+                    <a href="${pageContext.request.contextPath}/staff" class="btn btn-outline-light btn-sm fw-bold" style="min-width: 180px;">
                         <i class="fa-solid fa-arrow-left"></i> Trang Nhân Viên
                     </a>
                 </div>

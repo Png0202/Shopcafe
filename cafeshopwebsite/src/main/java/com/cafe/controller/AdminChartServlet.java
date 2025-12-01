@@ -21,7 +21,7 @@ public class AdminChartServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        
+        System.out.println("AdminChartServlet IS RUNNING...");
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         
