@@ -7,15 +7,15 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.cafe.model.CartItem;
-import com.cafe.util.DBConnection;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import com.cafe.model.CartItem;
+import com.cafe.util.DBConnection;
 
 @WebServlet("/cart")
 public class CartServlet extends HttpServlet {
@@ -78,7 +78,20 @@ public class CartServlet extends HttpServlet {
         request.setAttribute("cartItems", cart);
         request.setAttribute("grandTotal", grandTotal);
         
-        // --- LOGIC ĐIỀU HƯỚNG ---
+        // Gửi dữ liệu sang JSP
+        request.setAttribute("cartItems", cart);
+        
+        // 1. Tạm tính (Tổng tiền hàng)
+        request.setAttribute("subTotal", grandTotal);
+        
+        // 2. Phí vận chuyển cố định
+        double shippingFee = 15000.0;
+        request.setAttribute("shippingFee", shippingFee);
+        
+        // 3. Tổng cộng (Hàng + Ship)
+        request.setAttribute("grandTotal", grandTotal + shippingFee);
+        
+        // Điều hướng...
         if (currentTableId != null) {
             request.getRequestDispatcher("/table_order.jsp").forward(request, response);
         } else {

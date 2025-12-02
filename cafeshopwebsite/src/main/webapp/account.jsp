@@ -56,12 +56,23 @@
 
         /* Badge trạng thái */
         .badge-status { font-size: 0.85rem; padding: 8px 12px; }
+        
+        .btn-green {
+            background-color: #28a745 !important;  /* xanh lá đậm */
+            border-color: #28a745 !important;
+            color: white !important;
+        }
+        .btn-green:hover {
+            background-color: #218838 !important;
+            border-color: #1e7e34 !important;
+        }
+
     </style>
 </head>
 <body>
     <header>
         <div class="container">
-            <h1>☕ Quán Cà Phê Vĩnh Long</h1>
+            <h1>☕ Garden Coffee & Cake</h1>
             <nav>
                 <ul>
                     <li><a href="${pageContext.request.contextPath}/home">Trang Chủ</a></li>
@@ -251,7 +262,7 @@
                                                             <div class="d-flex justify-content-center gap-2">
                                                                 <button class="btn btn-sm btn-info text-white" onclick="viewOrderDetails('${o.id}', '${o.address}', '${o.paymentMethod}', '${o.note}')">Chi tiết</button>
                                                                 <c:if test="${o.status == 'Chờ thanh toán'}">
-                                                                    <a href="payment_qr.jsp?orderId=${o.id}&amount=${o.totalPrice}" class="btn btn-sm btn-success">Thanh toán</a>
+                                                                    <a href="payment_qr.jsp?orderId=48&amp;amount=135000.0" class="btn btn-sm btn-green">Thanh toán</a>
                                                                 </c:if>
                                                             </div>
                                                         </td>

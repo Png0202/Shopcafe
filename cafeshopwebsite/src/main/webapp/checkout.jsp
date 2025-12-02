@@ -31,9 +31,6 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
         
-        .marquee-content { display: inline-block; padding-left: 100%; animation: marquee 15s linear infinite; }
-        @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
-
         /* Responsive Mobile */
         @media (max-width: 992px) {
             .summary-card { position: static; margin-top: 20px; } /* Bỏ dính trên mobile */
@@ -43,7 +40,7 @@
 <body>
     <header>
         <div class="container">
-            <h1>☕ Quán Cà Phê Vĩnh Long</h1>
+            <h1>☕ Garden Coffee & Cake</h1>
             <nav>
                 <ul>
                     <li><a href="${pageContext.request.contextPath}/home">Trang Chủ</a></li>
@@ -206,7 +203,7 @@
                                     <span class="h4 mb-0 text-danger fw-bold"><fmt:formatNumber value="${requestScope.finalTotal}" pattern="#,###"/> ₫</span>
                                 </div>
                                 
-                                <button type="submit" class="btn btn-success w-100 py-3 fw-bold text-uppercase shadow" onclick="return confirm('Xác nhận đặt hàng?');">
+                                <button type="button" class="btn btn-success w-100 py-3 fw-bold text-uppercase shadow" data-bs-toggle="modal" data-bs-target="#confirmOrderModal">
                                     Xác Nhận Đặt Hàng <i class="fa-solid fa-check ms-2"></i>
                                 </button>
                             </div>
@@ -224,7 +221,32 @@
             <p>Sinh viên thực hiện: Phan Tuấn Cảnh - Võ Phúc Nguyên</p>
         </div>
     </footer>
-
+    <div class="modal fade" id="confirmOrderModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fa-solid fa-cart-check me-2"></i>Xác Nhận Đặt Hàng
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <div class="mb-3">
+                        <i class="fa-solid fa-box-open text-success fa-4x"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark">Bạn đã chắc chắn thông tin chưa?</h5>
+                    <p class="text-muted mb-0">Vui lòng kiểm tra kỹ <strong>địa chỉ</strong> và <strong>số điện thoại</strong> trước khi hoàn tất.</p>
+                </div>
+                <div class="modal-footer justify-content-center border-0 bg-light rounded-bottom">
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Kiểm tra lại</button>
+                    
+                    <button type="button" class="btn btn-success px-4 fw-bold" onclick="document.getElementById('checkoutForm').submit();">
+                        <i class="fa-solid fa-paper-plane me-2"></i>Đặt Hàng Ngay
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>

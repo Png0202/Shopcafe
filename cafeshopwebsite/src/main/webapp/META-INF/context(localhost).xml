@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+
+    <!-- Default set of monitored resources -->
+    <WatchedResource>WEB-INF/web.xml</WatchedResource>
+    <WatchedResource>WEB-INF/tomcat-web.xml</WatchedResource>
+    <WatchedResource>${catalina.base}/conf/web.xml</WatchedResource>
+
+    <!-- DataSource kết nối MySQL XAMPP -->
+    <Resource name="jdbc/cafeshop"
+          auth="Container"
+          type="javax.sql.DataSource"
+          maxTotal="20"
+          maxIdle="10"
+          maxWaitMillis="-1"
+          username="root"
+          password=""
+          driverClassName="com.mysql.cj.jdbc.Driver"
+          url="jdbc:mysql://localhost:3306/cafe_db?useSSL=false&amp;serverTimezone=UTC"/>
+
+
+</Context>

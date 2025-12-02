@@ -100,7 +100,7 @@
 <body>
     <header>
         <div class="container">
-            <h1>☕ Quán Cà Phê Vĩnh Long</h1>
+            <h1>☕ Garden Coffee & Cake</h1>
             <nav>
                 <ul>
                     <li><a href="${pageContext.request.contextPath}/home">Trang Chủ</a></li>
@@ -246,11 +246,11 @@
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between mb-2">
                                         <span class="text-muted">Tạm tính:</span>
-                                        <span class="fw-bold"><fmt:formatNumber value="${grandTotal}" pattern="#,###"/> ₫</span>
+                                        <span class="fw-bold"><fmt:formatNumber value="${subTotal}" pattern="#,###"/> ₫</span>
                                     </div>
                                     <div class="d-flex justify-content-between mb-3 border-bottom pb-3">
                                         <span class="text-muted">Phí vận chuyển:</span>
-                                        <span class="text-success">Miễn phí</span>
+                                        <span class="fw-bold text-dark"><fmt:formatNumber value="${shippingFee}" pattern="#,###"/> ₫</span>
                                     </div>
                                     <div class="d-flex justify-content-between align-items-center mb-4">
                                         <span class="h5 mb-0 fw-bold">Tổng cộng:</span>
@@ -270,13 +270,9 @@
                                                 </a>
                                             </div>
                                             <div class="col-6">
-                                                <form action="cart" method="post" onsubmit="return confirm('Xóa hết giỏ hàng?');" class="m-0">
-                                                    <input type="hidden" name="action" value="clear">
-                                                    <input type="hidden" name="productId" value="0">
-                                                    <button class="btn btn-outline-danger w-100">
-                                                        <i class="fa-solid fa-trash-can me-1"></i> Xóa hết
-                                                    </button>
-                                                </form>
+                                                <button type="button" class="btn btn-outline-danger w-100" data-bs-toggle="modal" data-bs-target="#clearCartModal">
+                                                    <i class="fa-solid fa-trash-can me-1"></i> Xóa hết
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -295,7 +291,36 @@
             <p>Sinh viên thực hiện: Phan Tuấn Cảnh - Võ Phúc Nguyên</p>
         </div>
     </footer>
-
+    <div class="modal fade" id="clearCartModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fa-solid fa-triangle-exclamation me-2"></i>Xác Nhận
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <div class="mb-3">
+                        <i class="fa-solid fa-trash-can text-danger fa-4x"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark">Xóa toàn bộ giỏ hàng?</h5>
+                    <p class="text-muted mb-0">Hành động này sẽ xóa tất cả sản phẩm và không thể hoàn tác.</p>
+                </div>
+                <div class="modal-footer justify-content-center border-0 bg-light rounded-bottom">
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Hủy Bỏ</button>
+                    
+                    <form action="cart" method="post" class="m-0">
+                        <input type="hidden" name="action" value="clear">
+                        <input type="hidden" name="productId" value="0">
+                        <button type="submit" class="btn btn-danger px-4 fw-bold">
+                            <i class="fa-solid fa-check me-2"></i>Xóa
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

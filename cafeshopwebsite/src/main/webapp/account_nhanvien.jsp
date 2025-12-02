@@ -14,19 +14,32 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     
     <style>
-        body { background-color: #f0f2f5; min-height: 100vh; display: flex; flex-direction: column; }
+        body { 
+            background-color: #f0f2f5;
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+        }
         
-        .staff-header { background: #343a40; padding: 15px 0; }
+        .staff-header { 
+            background: #343a40;
+            padding: 15px 0; 
+        }
         
-        /* Tab Navigation đẹp hơn */
+        /* Tab Navigation */
         .nav-pills .nav-link { 
-            color: #adb5bd; font-weight: bold; margin-right: 10px; cursor: pointer;
+            color: #adb5bd;
+            font-weight: bold; 
+            margin-right: 10px; 
+            cursor: pointer;
         }
         .nav-pills .nav-link.active { 
-            background-color: #d35400; color: white; 
+            background-color: #d35400;
+            color: white; 
         }
         .nav-pills .nav-link:hover:not(.active) { 
-            background-color: rgba(255,255,255,0.1); color: white;
+            background-color: rgba(255,255,255,0.1);
+            color: white;
         }
 
         /* Card Bàn */
@@ -39,7 +52,10 @@
             text-align: center;
             height: 100%;
         }
-        .table-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
+        .table-card:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
         
         .bg-table-empty { background-color: #28a745; } /* Xanh lá */
         .bg-table-busy { background-color: #dc3545; }  /* Đỏ */
@@ -48,30 +64,28 @@
         .tab-content-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Responsive Modal */
+        /* Badge Custom */
+        .badge {
+            font-size: 14px !important;
+            padding: 10px 15px !important;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* RESPONSIVE */
         @media (max-width: 992px) {
             .modal-content {
                 width: 95% !important;
                 margin: 10% auto;
             }
-        }
-        .badge {
-            font-size: 14px !important; /* Tăng cỡ chữ lên 14px */
-            padding: 10px 15px !important; /* Tăng khoảng cách để badge không bị chật */
-            font-weight: 600; /* Độ đậm chữ vừa phải */
-            letter-spacing: 0.5px; /* Khoảng cách chữ cho dễ đọc */
-        }
-        
-        /* Riêng badge ở chế độ Mobile/Tablet thì có thể chỉnh khác nếu cần */
-        @media (max-width: 992px) {
             .badge {
-                font-size: 13px !important; /* Mobile nhỏ hơn xíu cho gọn */
+                font-size: 13px !important;
                 padding: 8px 12px !important;
             }
         }
-        /* --- RESPONSIVE CHO MOBILE & TABLET --- */
+
         @media (max-width: 768px) {
-            /* Header: Logo và Menu xếp dọc */
+            /* Header Mobile */
             .staff-header .container {
                 flex-direction: column;
                 text-align: center;
@@ -88,49 +102,29 @@
                 margin-right: 0;
             }
 
-            /* Grid Bàn: Hiển thị 2 cột trên điện thoại */
-            .row-cols-2 {
-                --bs-gutter-x: 10px; /* Giảm khoảng cách giữa các cột */
-            }
-            .table-card {
-                padding: 1rem 0;
-            }
+            /* Grid & Table Mobile */
+            .row-cols-2 { --bs-gutter-x: 10px; }
+            .table-card { padding: 1rem 0; }
             .table-card h4 { font-size: 1.1rem; }
-
-            /* Bảng Đơn hàng: Cuộn ngang nếu quá dài */
-            .table-responsive {
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-            }
-            .table th, .table td {
-                white-space: nowrap; /* Giữ nội dung trên 1 dòng để bảng đẹp */
-                font-size: 0.85rem;
-                padding: 8px;
-            }
-
-            /* Modal Full màn hình */
-            .modal-content {
-                width: 95% !important;
-                margin: 10% auto;
-                padding: 15px;
-            }
+            .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            .table th, .table td { white-space: nowrap; font-size: 0.85rem; padding: 8px; }
             
-            /* Nút bấm nhỏ lại */
-            .btn-sm {
-                padding: 4px 8px;
-                font-size: 0.75rem;
-            }
-            
-        }
-        /* --- RESPONSIVE CHO MOBILE & TABLET --- */
-        @media (max-width: 768px) {
-
-            /* Tinh chỉnh nút Thêm Món nhỏ lại */
+            /* Buttons */
+            .btn-sm { padding: 4px 8px; font-size: 0.75rem; }
             .btn-add-mobile {
-                padding: 5px 10px !important; /* Giảm độ dày nút */
-                font-size: 12px !important;   /* Giảm cỡ chữ */
-                white-space: nowrap;          /* Không cho xuống dòng */
+                padding: 5px 10px !important;
+                font-size: 12px !important;
+                white-space: nowrap;
             }
+        }
+        .btn-green {
+            background-color: #28a745 !important;  /* xanh lá đậm */
+            border-color: #28a745 !important;
+            color: white !important;
+        }
+        .btn-green:hover {
+            background-color: #218838 !important;
+            border-color: #1e7e34 !important;
         }
     </style>
 </head>
@@ -138,7 +132,7 @@
 
     <header class="staff-header shadow-sm">
         <div class="container d-flex justify-content-between align-items-center">
-            <h3 class="text-white m-0"><i class="fa-solid fa-mug-hot me-2"></i>STAFF PORTAL</h3>
+            <h3 class="text-white m-0"><i class="fa-solid fa-mug-hot me-2"></i>Nhân Viên</h3>
             <ul class="nav nav-pills">
                 <li class="nav-item">
                     <a onclick="showTab('pos')" id="link-pos" class="nav-link active"><i class="fa-solid fa-shop me-2"></i>Quản Lý Bàn</a>
@@ -206,7 +200,6 @@
                                         <td><fmt:formatDate value="${o.orderDate}" pattern="dd/MM/yyyy HH:mm"/></td>
                                         <td class="fw-bold text-warning"><fmt:formatNumber value="${o.totalPrice}" pattern="#,###"/> đ</td>
                                         <td>
-                                            <%-- LOGIC BADGE BOOTSTRAP --%>
                                             <span class="badge rounded-pill 
                                                 ${o.status == 'Giao hàng thành công' ? 'bg-success' : 
                                                 (o.status == 'Đang giao hàng' ? 'bg-primary' : 
@@ -216,21 +209,20 @@
                                             </span>
                                         </td>
                                         <td>
-                                            <%-- LOGIC NÚT BẤM BOOTSTRAP --%>
                                             <div class="d-flex justify-content-center gap-2">
                                                 <button class="btn btn-sm btn-info text-white fw-bold" onclick="viewOrderDetail('${o.id}', '${o.address}', '${o.paymentMethod}', '${o.note}')">
                                                     <i class="fa-solid fa-eye"></i> Xem
                                                 </button>
                                                 
                                                 <c:if test="${o.status == 'Chờ thanh toán'}">
-                                                </c:if>
+                                                    </c:if>
                                                 <c:if test="${o.status == 'Đang xử lý'}">
-                                                    <button class="btn btn-sm btn-primary fw-bold" onclick="updateStatus('${o.id}', 'Đang giao hàng')">
+                                                    <button class="btn btn-sm btn-green fw-bold" onclick="updateStatus('${o.id}', 'Đang giao hàng')">
                                                         <i class="fa-solid fa-truck-fast"></i> Giao hàng
                                                     </button>
                                                 </c:if>
                                                 <c:if test="${o.status == 'Đang giao hàng'}">
-                                                    <button class="btn btn-sm btn-success fw-bold" onclick="updateStatus('${o.id}', 'Giao hàng thành công')">
+                                                    <button class="btn btn-sm btn-green fw-bold" onclick="updateStatus('${o.id}', 'Giao hàng thành công')">
                                                         <i class="fa-solid fa-check-circle"></i> Hoàn tất
                                                     </button>
                                                 </c:if>
@@ -305,6 +297,7 @@
             <div class="modal-content">
                 <div class="modal-header bg-light">
                     <h5 class="modal-title fw-bold text-warning" id="modalTableTitle">Xử Lý Bàn</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     
@@ -327,7 +320,7 @@
                                 </a>
                             </div>
                             <div class="col-6">
-                                <button onclick="submitCheckout()" class="btn btn-danger w-100 py-2">
+                                <button class="btn btn-danger w-100 py-2" data-bs-target="#checkoutConfirmModal" data-bs-toggle="modal">
                                     <i class="fa-solid fa-money-bill-wave me-1"></i> Thanh Toán
                                 </button>
                             </div>
@@ -355,7 +348,9 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title fw-bold" id="productModalTitle">Thêm Món Mới</h5></div>
+                    <h5 class="modal-title fw-bold" id="productModalTitle">Thêm Món Mới</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
                 <div class="modal-body">
                     <form action="staff" method="post" id="productForm">
                         <input type="hidden" name="action" id="formAction" value="add_product">
@@ -403,7 +398,8 @@
             <div class="modal-content">
                 <div class="modal-header bg-info text-white">
                     <h5 class="modal-title fw-bold">Chi Tiết Đơn Hàng #<span id="modalOrderId"></span></h5>
-                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
                 <div class="modal-body">
                     <div class="bg-light p-3 rounded mb-3">
                         <p class="mb-1"><strong><i class="fa-solid fa-location-dot text-danger"></i> Địa chỉ:</strong> <span id="modalAddress"></span></p>
@@ -421,14 +417,44 @@
         </div>
     </div>
 
+    <div class="modal fade" id="checkoutConfirmModal" tabindex="-1" aria-labelledby="confirmTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow-lg border-0">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title fw-bold" id="confirmTitle">
+                        <i class="fa-solid fa-circle-question me-2"></i>Xác Nhận Thanh Toán
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <div class="mb-3">
+                        <i class="fa-solid fa-cash-register text-danger fa-4x"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark">Bạn có chắc chắn muốn thanh toán?</h5>
+                    <p class="text-muted mb-0">
+                        Hành động này sẽ hoàn tất đơn hàng và <strong class="text-danger">trả bàn về trạng thái trống</strong>.
+                    </p>
+                </div>
+                <div class="modal-footer justify-content-center bg-light border-0">
+                    <button type="button" class="btn btn-secondary px-4" data-bs-target="#tableModal" data-bs-toggle="modal">Hủy Bỏ</button>
+                    <button type="button" class="btn btn-danger px-4 fw-bold" onclick="confirmCheckoutAction()">
+                        <i class="fa-solid fa-check me-2"></i>Xác Nhận
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Init Modals
+        // === INIT MODALS ===
         const tableModal = new bootstrap.Modal(document.getElementById('tableModal'));
         const orderDetailModal = new bootstrap.Modal(document.getElementById('orderDetailModal'));
+        const productModal = new bootstrap.Modal(document.getElementById('productModal'));
+        const checkoutConfirmModal = new bootstrap.Modal(document.getElementById('checkoutConfirmModal'));
 
-        // 1. CHUYỂN TAB
+        // === 1. TAB NAVIGATION ===
         function showTab(name) {
             document.querySelectorAll('.tab-content-section').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
@@ -437,11 +463,10 @@
             document.getElementById('link-' + name).classList.add('active');
         }
 
-        // 2. XỬ LÝ CLICK BÀN
+        // === 2. XỬ LÝ BÀN (POS) ===
         function handleTableClick(id, name, status) {
             document.getElementById('modalTableTitle').innerText = name;
             
-            // Reset display
             const emptyDiv = document.getElementById('emptyTableAction');
             const busyDiv = document.getElementById('busyTableAction');
             
@@ -464,22 +489,19 @@
             tableModal.show();
         }
 
-        // 3. LOAD CHI TIẾT BÀN (AJAX)
         function loadTableOrders(tableId) {
             document.getElementById('tableOrderList').innerHTML = '<div class="text-center"><div class="spinner-border text-warning" role="status"></div></div>';
             fetch('${pageContext.request.contextPath}/staff?action=get_table_detail&tableId=' + tableId)
                 .then(res => res.text())
                 .then(html => { document.getElementById('tableOrderList').innerHTML = html; });
         }
-
-        // 4. XỬ LÝ THANH TOÁN
-        function submitCheckout() {
-            if(confirm('Xác nhận thanh toán và hoàn tất bàn này?')) {
-                document.getElementById('checkoutForm').submit();
-            }
+        // Xử lý xác nhận thanh toán
+        function confirmCheckoutAction() {
+            document.getElementById('checkoutForm').submit();
+            checkoutConfirmModal.hide();
         }
 
-        // 5. XỬ LÝ ĐƠN ONLINE
+        // === 3. XỬ LÝ ĐƠN ONLINE ===
         function updateStatus(orderId, newStatus) {
             if(confirm('Cập nhật trạng thái thành: ' + newStatus + '?')) {
                 window.location.href = '${pageContext.request.contextPath}/staff?action=update_status&orderId=' + orderId + '&status=' + encodeURIComponent(newStatus);
@@ -505,10 +527,9 @@
                 });
         }
 
-        // 6. AUTO RELOAD (Polling) - Tự động cập nhật đơn online mới mỗi 5 giây
+        // Auto Reload Orders (Polling)
         function autoReloadOrders() {
             const onlineTab = document.getElementById('tab-online');
-            // Kiểm tra xem tab online có đang active không
             if (onlineTab.classList.contains('active') || getComputedStyle(onlineTab).display !== 'none') {
                 fetch('${pageContext.request.contextPath}/staff?action=get_online_orders_ajax')
                     .then(res => res.text())
@@ -523,18 +544,8 @@
         }
         setInterval(autoReloadOrders, 5000);
 
-        // 7. AUTO OPEN TAB FROM URL
-        document.addEventListener("DOMContentLoaded", function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('tab') === 'online') {
-                showTab('online');
-            }
-        });
-        // --- QUẢN LÝ MENU ---
-        const productModal = new bootstrap.Modal(document.getElementById('productModal'));
-
+        // === 4. QUẢN LÝ MENU (CRUD) ===
         function openProductModal() {
-            // Reset form để thêm mới
             document.getElementById('productForm').reset();
             document.getElementById('formAction').value = 'add_product';
             document.getElementById('productModalTitle').innerText = 'Thêm Món Mới';
@@ -542,7 +553,6 @@
         }
 
         function editProduct(id, name, desc, price, cat, img) {
-            // Điền dữ liệu để sửa
             document.getElementById('formAction').value = 'edit_product';
             document.getElementById('productModalTitle').innerText = 'Cập Nhật Món';
             
@@ -556,13 +566,13 @@
             productModal.show();
         }
 
-        // Cập nhật lại logic mở tab từ URL
+        // === 5. URL PARAMS HANDLER ===
         document.addEventListener("DOMContentLoaded", function() {
             const urlParams = new URLSearchParams(window.location.search);
             const activeTab = urlParams.get('tab');
             
             if (activeTab === 'online') showTab('online');
-            else if (activeTab === 'menu') showTab('menu'); // Thêm dòng này
+            else if (activeTab === 'menu') showTab('menu');
             else showTab('pos');
         });
     </script>

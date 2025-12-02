@@ -65,12 +65,78 @@
             margin-bottom: 10px;
             font-weight: 500;
         }
+                /* Container neo ở góc trên bên phải */
+        #toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Style Toast (Giữ nguyên giao diện đẹp nhưng chỉnh lại animation) */
+        .vue-toast {
+            background-color: #4caf50;
+            color: #fff;
+            border-radius: 8px;
+            padding: 16px 24px 20px 20px;
+            display: flex;
+            align-items: flex-start;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+            font-family: "Roboto", sans-serif;
+            min-width: 320px;
+            /* Hiệu ứng trượt vào */
+            animation: slideInRight 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.5s ease;
+        }
+
+        /* Các biến thể màu */
+        .vue-toast.error { background-color: #ff5252; }
+        .vue-toast.warning { background-color: #ffc107; color: #333; }
+
+        /* Icon và Nội dung */
+        .vue-toast-icon { margin-right: 18px; font-size: 22px; padding-top: 2px; }
+        .vue-toast-body { flex-grow: 1; font-size: 15px; font-weight: 500; line-height: 1.4; }
+
+        /* Nút tắt */
+        .vue-toast-close {
+            background: transparent; border: none; color: #fff;
+            cursor: pointer; font-size: 20px; opacity: 0.7; margin-left: 15px;
+        }
+        .vue-toast-close:hover { opacity: 1; }
+
+        /* Thanh thời gian (Chạy trong 3 giây) */
+        .vue-toast-progress {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 5px;
+            background-color: rgba(255, 255, 255, 0.7);
+            transform-origin: left;
+            /* QUAN TRỌNG: Chạy hết trong 3s */
+            animation: timeOut 3s linear forwards; 
+        }
+
+        /* Keyframes */
+        @keyframes slideInRight {
+            from { transform: translateX(120%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes timeOut {
+            to { transform: scaleX(0); }
+        }
+        /* Class để JS thêm vào khi ẩn đi */
+        .toast-hide {
+            transform: translateX(120%);
+            opacity: 0;
+        }
     </style>
 </head>
 <body>
     <header>
         <div class="container">
-            <h1>☕ Quán Cà Phê Vĩnh Long</h1>
+            <h1>☕ Garden Coffee & Cake</h1>
             <nav>
                 <ul>
                     <li><a href="${pageContext.request.contextPath}/home">Trang Chủ</a></li>
@@ -89,21 +155,52 @@
             </div>
             
             <div class="card-body p-4">
-                <c:if test="${param.register == 'success'}">
-                    <div class="alert alert-success py-2 text-center small"><i class="fa-solid fa-check-circle"></i> Đăng ký thành công! Vui lòng đăng nhập.</div>
-                </c:if>
-                <c:if test="${param.error == 'login_failed'}">
-                    <div class="alert alert-danger py-2 text-center small"><i class="fa-solid fa-triangle-exclamation"></i> Sai email hoặc mật khẩu!</div>
-                </c:if>
-                <c:if test="${param.error == 'email_exists'}">
-                    <div class="alert alert-danger py-2 text-center small">⚠️ Email này đã được sử dụng!</div>
-                </c:if>
-                <c:if test="${param.error == 'phone_exists'}">
-                    <div class="alert alert-danger py-2 text-center small">⚠️ Số điện thoại này đã tồn tại!</div>
-                </c:if>
-                <c:if test="${param.error == 'password_mismatch'}">
-                    <div class="alert alert-danger py-2 text-center small">❌ Mật khẩu xác nhận không khớp!</div>
-                </c:if>
+                <div id="toast-container">
+                    <c:if test="${param.register == 'success'}">
+                        <div class="vue-toast" data-autohide="true">
+                            <div class="vue-toast-icon"><i class="fa-solid fa-check-circle"></i></div>
+                            <div class="vue-toast-body">Đăng ký thành công!<br>Vui lòng đăng nhập.</div>
+                            <button class="vue-toast-close" onclick="closeToast(this)">×</button>
+                            <div class="vue-toast-progress"></div>
+                        </div>
+                    </c:if>
+
+                    <c:if test="${param.error == 'login_failed'}">
+                        <div class="vue-toast error" data-autohide="true">
+                            <div class="vue-toast-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                            <div class="vue-toast-body">Sai email hoặc mật khẩu!</div>
+                            <button class="vue-toast-close" onclick="closeToast(this)">×</button>
+                            <div class="vue-toast-progress"></div>
+                        </div>
+                    </c:if>
+
+                    <c:if test="${param.error == 'email_exists'}">
+                        <div class="vue-toast error" data-autohide="true">
+                            <div class="vue-toast-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                            <div class="vue-toast-body">Email này đã được sử dụng!</div>
+                            <button class="vue-toast-close" onclick="closeToast(this)">×</button>
+                            <div class="vue-toast-progress"></div>
+                        </div>
+                    </c:if>
+
+                    <c:if test="${param.error == 'phone_exists'}">
+                        <div class="vue-toast error" data-autohide="true">
+                            <div class="vue-toast-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                            <div class="vue-toast-body">Số điện thoại này đã tồn tại!</div>
+                            <button class="vue-toast-close" onclick="closeToast(this)">×</button>
+                            <div class="vue-toast-progress"></div>
+                        </div>
+                    </c:if>
+
+                    <c:if test="${param.error == 'password_mismatch'}">
+                        <div class="vue-toast error" data-autohide="true">
+                            <div class="vue-toast-icon"><i class="fa-solid fa-circle-xmark"></i></div>
+                            <div class="vue-toast-body">Mật khẩu xác nhận không khớp!</div>
+                            <button class="vue-toast-close" onclick="closeToast(this)">×</button>
+                            <div class="vue-toast-progress"></div>
+                        </div>
+                    </c:if>
+                </div>
 
                 <ul class="nav nav-tabs nav-fill mb-4" id="loginTabs" role="tablist">
                     <li class="nav-item" role="presentation">
@@ -155,7 +252,7 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Số điện thoại</label>
-                                <input type="tel" name="phone" class="form-control" placeholder="Nhập 10 số điện thoại" required pattern="[0-9]{10}">
+                                <input type="tel" name="phone" class="form-control" placeholder="Nhập số điện thoại (bắt đầu bằng số 0)" required pattern="^0[0-9]{9}$" maxlength="10" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Mật khẩu</label>
@@ -203,5 +300,30 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    // Hàm đóng toast ngay lập tức khi bấm nút X
+    function closeToast(button) {
+        const toast = button.closest('.vue-toast');
+        toast.classList.add('toast-hide');
+        setTimeout(() => toast.remove(), 500); // Đợi hiệu ứng bay ra xong mới xóa DOM
+    }
+
+    // Tự động đóng sau 3 giây
+    document.addEventListener("DOMContentLoaded", function() {
+        const toasts = document.querySelectorAll('.vue-toast[data-autohide="true"]');
+        
+        toasts.forEach(toast => {
+            setTimeout(() => {
+                // Thêm class để kích hoạt animation bay ra
+                toast.classList.add('toast-hide');
+                
+                // Xóa khỏi DOM sau khi animation kết thúc (0.5s)
+                setTimeout(() => {
+                    toast.remove();
+                }, 500);
+            }, 3000); // 3000ms = 3 giây
+        });
+    });
+</script>
 </body>
 </html>

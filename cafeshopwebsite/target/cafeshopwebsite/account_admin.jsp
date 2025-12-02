@@ -50,7 +50,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark navbar-admin sticky-top">
         <div class="container">
             <a class="navbar-brand fw-bold text-warning" href="#">
-                <i class="fa-solid fa-mug-hot me-2"></i>ADMIN CP
+                <i class="fa-solid fa-mug-hot me-2"></i>ADMIN
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNavbar">
                 <span class="navbar-toggler-icon"></span>
@@ -182,8 +182,36 @@
 
             <div class="row g-4">
                 <div class="col-lg-6">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                            <h5 class="m-0 fw-bold text-secondary">Biểu Đồ Doanh Thu</h5>
+                            <select class="form-select form-select-sm" onchange="updateRevenueChart(this.value)">
+                                <option value="today">Hôm nay</option>
+                                <option value="week" selected>7 Ngày qua</option>
+                                <option value="month">Tháng này</option>
+                                <option value="year">Năm nay</option>
+                            </select>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="revenueChart"></canvas>
+                        </div>
+                    </div>
                 </div>
                 <div class="col-lg-6">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                            <h5 class="m-0 fw-bold text-secondary">Biểu Đồ Đơn Hàng</h5>
+                            <select class="form-select form-select-sm" onchange="updateOrderChart(this.value)">
+                                <option value="today">Hôm nay</option>
+                                <option value="week" selected>7 Ngày qua</option>
+                                <option value="month">Tháng này</option>
+                                <option value="year">Năm nay</option>
+                            </select>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="orderChart"></canvas>
+                        </div>
+                    </div>
                 </div>
             </div>
 

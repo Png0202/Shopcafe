@@ -58,7 +58,7 @@
     
     <header>
         <div class="container">
-            <h1>☕ Quán Cà Phê Vĩnh Long</h1>
+            <h1>☕ Garden Coffee & Cake</h1>
             <nav>
                 <ul>
                     <li><a href="${pageContext.request.contextPath}/home" class="active">Trang Chủ</a></li>
@@ -92,7 +92,7 @@
             <div class="row justify-content-center">
                 <div class="col-lg-8">
                     <h1 class="display-4 fw-bold mb-3">Hương Vị Đánh Thức Mọi Giác Quan</h1>
-                    <p class="lead mb-4">Trải nghiệm cà phê nguyên bản và không gian thư giãn tuyệt vời tại Vĩnh Long. Chúng tôi mang đến những ly cà phê đậm đà nhất.</p>
+                    <p class="lead mb-4">Trải nghiệm cà phê nguyên bản và không gian thư giãn tuyệt vời. Chúng tôi mang đến những ly cà phê đậm đà nhất.</p>
                     <a href="${pageContext.request.contextPath}/menu" class="btn btn-light btn-lg fw-bold text-dark px-5 py-3 rounded-pill shadow">
                         <i class="fa-solid fa-mug-hot me-2"></i>Khám Phá Menu
                     </a>
@@ -126,17 +126,9 @@
                         <p class="lead text-muted mb-4">
                             ${not empty product.description ? product.description : 'Hương vị đậm đà khó quên, được pha chế từ những nguyên liệu tuyển chọn kỹ lưỡng nhất. Một sự lựa chọn hoàn hảo để bắt đầu ngày mới.'}
                         </p>
-                        
-                        <div class="price-text fw-bold mb-4">
-                            <fmt:formatNumber value="${product.price}" pattern="#,###"/> VNĐ
-                        </div>
-
                         <form action="cart" method="post" class="d-inline-block">
                             <input type="hidden" name="action" value="add">
                             <input type="hidden" name="productId" value="${product.id}">
-                            <button type="submit" class="btn btn-dark btn-lg rounded-pill px-5 py-3 shadow hover-effect">
-                                Đặt Món Ngay <i class="fa-solid fa-arrow-right ms-2"></i>
-                            </button>
                         </form>
                     </div>
 

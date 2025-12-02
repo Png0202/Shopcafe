@@ -77,9 +77,9 @@ public class StaffServlet extends HttpServlet {
                     
                     if ("Chờ thanh toán".equals(status)) {
                     } else if ("Đang xử lý".equals(status)) {
-                        html.append("<button class='btn btn-sm btn-primary fw-bold' onclick=\"updateStatus('").append(id).append("', 'Đang giao hàng')\"><i class='fa-solid fa-truck-fast'></i> Giao hàng</button>");
+                        html.append("<button class='btn btn-sm btn-green fw-bold' onclick=\"updateStatus('").append(id).append("', 'Đang giao hàng')\"><i class='fa-solid fa-truck-fast'></i> Giao hàng</button>");
                     } else if ("Đang giao hàng".equals(status)) {
-                        html.append("<button class='btn btn-sm btn-success fw-bold' onclick=\"updateStatus('").append(id).append("', 'Giao hàng thành công')\"><i class='fa-solid fa-check-circle'></i> Hoàn tất</button>");
+                        html.append("<button class='btn btn-sm btn-green fw-bold' onclick=\"updateStatus('").append(id).append("', 'Giao hàng thành công')\"><i class='fa-solid fa-check-circle'></i> Hoàn tất</button>");
                     }
                     html.append("</div></td></tr>");
                 }
@@ -298,6 +298,7 @@ public class StaffServlet extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
             response.sendRedirect("staff?error=failed");
+            
         }
     }
 }
