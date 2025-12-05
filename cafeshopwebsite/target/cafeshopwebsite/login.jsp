@@ -219,22 +219,22 @@
                                 <label class="form-label fw-bold">Email</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
-                                    <input type="email" name="email" class="form-control" placeholder="Nhập email của bạn" required>
+                                    <input type="email" name="email" class="form-control" placeholder="Nhập email của bạn" required value="${cookie.c_email.value}">
                                 </div>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Mật khẩu</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
-                                    <input type="password" name="password" class="form-control" placeholder="Nhập mật khẩu" required>
+                                    <input type="password" name="password" class="form-control" placeholder="Nhập mật khẩu" required value="${cookie.c_pass.value}">
                                 </div>
                             </div>
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" id="rememberMe">
+                                    <input type="checkbox" class="form-check-input" id="rememberMe" name="remember" ${cookie.c_email != null ? 'checked' : ''}>
                                     <label class="form-check-label small" for="rememberMe">Ghi nhớ đăng nhập</label>
                                 </div>
-                                <a href="#" class="small text-decoration-none" onclick="alert('Chức năng đang phát triển!')">Quên mật khẩu?</a>
+                                <a href="forgot_password.jsp" class="small text-decoration-none">Quên mật khẩu?</a>
                             </div>
                             <button type="submit" class="btn btn-primary w-100 py-2 fw-bold" style="background-color: #d35400; border-color: #d35400;">ĐĂNG NHẬP</button>
                         </form>
@@ -276,16 +276,10 @@
                 
                 <div class="text-center mb-3 small text-muted">Hoặc đăng nhập bằng</div>
                 <div class="row">
-                    <div class="col-6">
-                        <button class="btn btn-outline-primary social-btn" onclick="alert('Chức năng đang phát triển!')">
-                            <i class="fa-brands fa-facebook"></i> Facebook
-                        </button>
-                    </div>
-                    <div class="col-6">
-                        <button class="btn btn-outline-danger social-btn" onclick="alert('Chức năng đang phát triển!')">
-                            <i class="fa-brands fa-google"></i> Google
-                        </button>
-                    </div>
+                    <a href="https://accounts.google.com/o/oauth2/auth?scope=email profile&redirect_uri=https://shopcafe.onrender.com/login-google/login-google&response_type=code&client_id=197666350056-9pqv4650vrejdaurpflk52l6ks65emse.apps.googleusercontent.com&approval_prompt=force" 
+                        class="btn-secondary" style="text-decoration: none; display: inline-block; width: 48%; text-align: center; padding: 10px;">
+                        <i class="fa-brands fa-google"></i> Google
+                        </a>
                 </div>
 
             </div>

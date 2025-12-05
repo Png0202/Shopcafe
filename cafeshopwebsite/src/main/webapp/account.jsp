@@ -21,19 +21,26 @@
         /* Tinh chỉnh lại một chút để Bootstrap không đánh nhau với CSS cũ */
         body { background-color: #f8f9fa; }
         
-        /* Sidebar Menu đẹp hơn */
-        .list-group-item.active {
-            background-color: #d35400;
-            border-color: #d35400;
-        }
+        /* --- SIDEBAR MENU --- */
         .list-group-item { cursor: pointer; transition: 0.3s; }
-        .list-group-item:not(.active):hover { 
-            background-color: #f1f1f1; 
+        
+        /* Style cho mục đang chọn (Active) */
+        .list-group-item.active {
+            background-color: #d35400 !important;
+            border-color: #d35400 !important;
+            color: white !important;
         }
+
+        /* Style Hover: Chỉ áp dụng khi KHÔNG CÓ class active */
+        .list-group-item:not(.active):hover { 
+            background-color: #f1f1f1 !important; 
+            color: #d35400;
+        }
+        
+        /* Đảm bảo khi hover vào mục đang active thì màu vẫn giữ nguyên */
         .list-group-item.active:hover {
-            background-color: #d35400;
-            border-color: #d35400;
-            color: white;
+            background-color: #d35400 !important;
+            color: white !important;
         }
 
         /* Ẩn hiện Tab */
@@ -42,7 +49,7 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         /* Map & Autocomplete */
-        #map { height: 300px; width: 100%; border-radius: 5px; z-index: 1; }
+        #map { height: 300px; width: 100%; border-radius: 5px; z-index: 1; margin-top: 10px;}
         
         .suggestions-list { 
             position: absolute; top: 100%; left: 0; right: 0; 
@@ -55,18 +62,131 @@
         .suggestions-list li:hover { background-color: #f8f9fa; color: #d35400; }
 
         /* Badge trạng thái */
-        .badge-status { font-size: 0.85rem; padding: 8px 12px; }
-        
-        .btn-green {
-            background-color: #28a745 !important;  /* xanh lá đậm */
-            border-color: #28a745 !important;
-            color: white !important;
-        }
-        .btn-green:hover {
-            background-color: #218838 !important;
-            border-color: #1e7e34 !important;
+        .badge-status { 
+            font-size: 14px !important; /* Tăng kích thước chữ */
+            padding: 10px 15px !important; 
+            font-weight: 600;
         }
 
+        /* Tiêu đề Section (Căn giữa đồng bộ) */
+        .section-header {
+            text-transform: uppercase;
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            text-align: center; /* CĂN GIỮA */
+            color: #d35400;
+            font-weight: bold;
+        }
+
+        /* Modal Styles (PC Default) */
+        .modal-content { 
+            background: white; 
+            margin: 5% auto; 
+            padding: 20px; 
+            border-radius: 8px; 
+            position: relative; 
+            max-height: 90vh; 
+            overflow-y: auto; 
+        }
+
+        /* --- RESPONSIVE (MOBILE & TABLET) --- */
+        @media (max-width: 992px) {
+            /* Layout 1 cột */
+            .account-layout { flex-direction: column; }
+            
+            /* Modal Responsive (Khóa kéo ngang khung, cho phép cuộn bảng) */
+            .modal-content {
+                width: 95% !important;
+                max-width: 95% !important;
+                margin: 15% auto;
+                padding: 15px;
+                max-height: 80vh;
+                box-sizing: border-box;
+                overflow-x: hidden; /* Khóa kéo ngang của khung Modal */
+                overflow-y: auto;
+            }
+            
+            #modalOrderItems {
+                width: 100%;
+                overflow-x: auto; /* Chỉ cho bảng cuộn ngang */
+            }
+            #modalOrderItems table {
+                width: 100%;
+                min-width: 100%;
+                border-collapse: collapse;
+            }
+
+            /* --- BIẾN BẢNG ĐƠN HÀNG THÀNH DẠNG CARD DỌC --- */
+            .table-responsive thead { display: none; } /* Ẩn tiêu đề bảng */
+            
+            .table-responsive tbody tr {
+                display: block;
+                background: #fff;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                margin-bottom: 15px;
+                padding: 15px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            }
+            
+            .table-responsive td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 8px 0;
+                border-bottom: 1px dashed #eee;
+                text-align: right;
+                border-top: none !important; /* Xóa border mặc định của bootstrap table */
+            }
+            
+            .table-responsive td:last-child {
+                border-bottom: none;
+                justify-content: center; /* Căn giữa nút bấm */
+                padding-top: 15px;
+            }
+            
+            /* Hiển thị nhãn (Label) trước nội dung */
+            .table-responsive td::before {
+                content: attr(data-label);
+                font-weight: bold;
+                text-align: left;
+                color: #666;
+                flex: 1;
+            }
+        }
+        /* --- TOAST NOTIFICATION --- */
+        #toast-container {
+            position: fixed; top: 20px; right: 20px; z-index: 9999;
+            display: flex; flexDirection: column; gap: 10px;
+        }
+        .vue-toast {
+            background-color: #28a745; color: #fff;
+            border-radius: 8px; padding: 16px 24px 20px 20px;
+            display: flex; alignItems: flex-start;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            position: relative; overflow: hidden; min-width: 320px;
+            animation: slideInRight 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.5s ease;
+        }
+        .vue-toast.error { background-color: #dc3545; }
+        .vue-toast-icon { margin-right: 15px; font-size: 20px; }
+        .vue-toast-body { flex-grow: 1; font-size: 14px; font-weight: 500; }
+        .vue-toast-close { background: transparent; border: none; color: #fff; cursor: pointer; font-size: 20px; opacity: 0.7; }
+        .vue-toast-progress {
+            position: absolute; 
+            bottom: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 4px;
+            background-color: rgba(255, 255, 255, 0.5);
+            transform-origin: left; 
+            animation: timeOut 3s linear forwards;
+        }
+        
+        @keyframes slideInRight { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes timeOut { to { transform: scaleX(0); } }
+        .toast-hide { transform: translateX(120%); opacity: 0; }
     </style>
 </head>
 <body>
@@ -116,7 +236,7 @@
                             <i class="fa-solid fa-user me-2"></i> Thông tin tài khoản
                         </a>
                         <a onclick="showTab('addresses')" id="nav-addresses" class="list-group-item list-group-item-action">
-                            <i class="fa-solid fa-location-dot me-2"></i>Quản lý địa chỉ (${empty requestScope.addressCount ? 0 : requestScope.addressCount})
+                            <i class="fa-solid fa-location-dot me-2"></i> Sổ địa chỉ (${empty requestScope.addressCount ? 0 : requestScope.addressCount})
                         </a>
                         <a onclick="showTab('orders')" id="nav-orders" class="list-group-item list-group-item-action">
                             <i class="fa-solid fa-box me-2"></i> Đơn hàng của bạn
@@ -135,43 +255,119 @@
             <div class="col-md-9">
                 <div class="card shadow-sm border-0">
                     <div class="card-body p-4">
-
-                        <div id="notification-area">
-                            <c:if test="${param.status == 'success'}"><div class="alert alert-success"><i class="fa-solid fa-check-circle"></i> Thao tác thành công!</div></c:if>
-                            <c:if test="${param.status == 'deleted'}"><div class="alert alert-success"><i class="fa-solid fa-trash"></i> Đã xóa địa chỉ!</div></c:if>
-                            <c:if test="${param.status == 'updated'}"><div class="alert alert-success"><i class="fa-solid fa-pen"></i> Cập nhật thành công!</div></c:if>
-                            <c:if test="${param.status == 'error'}"><div class="alert alert-danger"><i class="fa-solid fa-triangle-exclamation"></i> Có lỗi xảy ra!</div></c:if>
-                            <c:if test="${param.error == 'wrong_pass'}"><div class="alert alert-danger">❌ Mật khẩu cũ không đúng!</div></c:if>
-                            <c:if test="${param.error == 'mismatch'}"><div class="alert alert-danger">❌ Mật khẩu xác nhận không khớp!</div></c:if>
+                        <%-- Thông báo --%>
+                        <div id="toast-container">
+                            
+                            <%-- THÀNH CÔNG --%>
+                            <c:if test="${param.status == 'success'}">
+                                <div class="vue-toast" data-autohide="true">
+                                    <div class="vue-toast-icon"><i class="fa-solid fa-check-circle"></i></div>
+                                    <div class="vue-toast-body">Thao tác thành công!</div>
+                                    <button class="vue-toast-close" onclick="closeToast(this)">×</button>
+                                    <div class="vue-toast-progress"></div>
+                                </div>
+                            </c:if>
+                            <c:if test="${param.status == 'deleted'}">
+                                <div class="vue-toast" data-autohide="true">
+                                    <div class="vue-toast-icon"><i class="fa-solid fa-trash"></i></div>
+                                    <div class="vue-toast-body">Đã xóa địa chỉ thành công!</div>
+                                    <button class="vue-toast-close" onclick="closeToast(this)">×</button>
+                                    <div class="vue-toast-progress"></div>
+                                </div>
+                            </c:if>
+                            <c:if test="${param.status == 'updated'}">
+                                <div class="vue-toast" data-autohide="true">
+                                    <div class="vue-toast-icon"><i class="fa-solid fa-pen-to-square"></i></div>
+                                    <div class="vue-toast-body">Cập nhật thông tin thành công!</div>
+                                    <button class="vue-toast-close" onclick="closeToast(this)">×</button>
+                                    <div class="vue-toast-progress"></div>
+                                </div>
+                            </c:if>
+                            <c:if test="${param.status == 'phone_exists'}">
+                                <div class="vue-toast error" data-autohide="true">
+                                    <div class="vue-toast-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                                    <div class="vue-toast-body">Số điện thoại này đã được sử dụng bởi tài khoản khác!</div>
+                                    <button class="vue-toast-close" onclick="closeToast(this)">×</button>
+                                    <div class="vue-toast-progress"></div>
+                                </div>
+                            </c:if>
+                            <%-- LỖI --%>
+                            <c:if test="${param.status == 'error'}">
+                                <div class="vue-toast error" data-autohide="true">
+                                    <div class="vue-toast-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                                    <div class="vue-toast-body">Có lỗi xảy ra, vui lòng thử lại!</div>
+                                    <button class="vue-toast-close" onclick="closeToast(this)">×</button>
+                                    <div class="vue-toast-progress"></div>
+                                </div>
+                            </c:if>
+                            <c:if test="${param.error == 'wrong_pass'}">
+                                <div class="vue-toast error" data-autohide="true">
+                                    <div class="vue-toast-icon"><i class="fa-solid fa-lock"></i></div>
+                                    <div class="vue-toast-body">Mật khẩu cũ không đúng!</div>
+                                    <button class="vue-toast-close" onclick="closeToast(this)">×</button>
+                                    <div class="vue-toast-progress"></div>
+                                </div>
+                            </c:if>
+                            <c:if test="${param.error == 'mismatch'}">
+                                <div class="vue-toast error" data-autohide="true">
+                                    <div class="vue-toast-icon"><i class="fa-solid fa-circle-xmark"></i></div>
+                                    <div class="vue-toast-body">Mật khẩu xác nhận không khớp!</div>
+                                    <button class="vue-toast-close" onclick="closeToast(this)">×</button>
+                                    <div class="vue-toast-progress"></div>
+                                </div>
+                            </c:if>
                         </div>
 
-                        <%-- TAB 1: THÔNG TIN TÀI KHOẢN --%>
+                        <%-- TAB 1: THÔNG TIN TÀI KHOẢN (ĐÃ SỬA LỖI FORM) --%>
                         <div id="tab-info" class="tab-content-section active-section">
-                            <h4 class="text-uppercase border-bottom pb-2 mb-4 text-center text-warning fw-bold">Thông Tin Tài Khoản</h4>
-                            <form>
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold text-muted">Họ và tên</label>
-                                    <input type="text" value="${requestScope.fullname}" class="form-control bg-light" disabled>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold text-muted">Email</label>
-                                    <input type="text" value="${requestScope.email}" class="form-control bg-light" disabled>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold text-muted">Số điện thoại</label>
-                                    <input type="text" value="${requestScope.phone}" class="form-control bg-light" disabled>
-                                </div>
-                                <div class="text-center mt-4">
-                                    <a onclick="showTab('addresses')" class="text-decoration-none text-warning fw-bold" style="cursor:pointer;">
-                                        Quản lý sổ địa chỉ <i class="fa-solid fa-arrow-right"></i>
-                                    </a>
-                                </div>
-                            </form>
+                            <h4 class="section-header">Thông Tin Tài Khoản</h4>
+                            
+                            <%-- Các ô input chỉ xem (Không cần nằm trong form) --%>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-muted">Họ và tên</label>
+                                <input type="text" value="${requestScope.fullname}" class="form-control bg-light" disabled>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-muted">Email</label>
+                                <input type="text" value="${requestScope.email}" class="form-control bg-light" disabled>
+                            </div>
+
+                            <%-- LOGIC CẬP NHẬT SỐ ĐIỆN THOẠI --%>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-muted">Số điện thoại</label>
+                                <c:choose>
+                                    <%-- Trường hợp 1: Chưa có SĐT -> Hiện Form nhập liệu --%>
+                                    <c:when test="${empty requestScope.phone}">
+                                        <form action="${pageContext.request.contextPath}/profile" method="post">
+                                            <input type="hidden" name="action" value="update_phone">
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-white text-warning"><i class="fa-solid fa-phone"></i></span>
+                                                <input type="tel" name="phone" class="form-control" placeholder="Vui lòng cập nhật số điện thoại..." required pattern="^0[0-9]{9}$" maxlength="10" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                                                <button class="btn btn-warning text-white fw-bold" type="submit">Lưu SĐT</button>
+                                            </div>
+                                            <div class="form-text text-danger small">
+                                                <i class="fa-solid fa-circle-exclamation"></i> Bạn đang đăng nhập bằng Google và chưa có số điện thoại. Vui lòng cập nhật để đặt hàng.
+                                            </div>
+                                        </form>
+                                    </c:when>
+                                    
+                                    <%-- Trường hợp 2: Đã có SĐT -> Chỉ hiện ô input disabled --%>
+                                    <c:otherwise>
+                                        <input type="text" value="${requestScope.phone}" class="form-control bg-light" disabled>
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
+
+                            <div class="text-center mt-4">
+                                <a onclick="showTab('addresses')" class="text-decoration-none text-warning fw-bold" style="cursor:pointer;">
+                                    Quản lý sổ địa chỉ <i class="fa-solid fa-arrow-right"></i>
+                                </a>
+                            </div>
                         </div>
 
                         <%-- TAB 2: SỔ ĐỊA CHỈ --%>
                         <div id="tab-addresses" class="tab-content-section">
-                            <h4 class="text-uppercase border-bottom pb-2 mb-4 text-center text-warning fw-bold">Sổ Địa Chỉ</h4>
+                            <h4 class="section-header">Sổ Địa Chỉ</h4>
                             
                             <div class="mb-4">
                                 <c:choose>
@@ -218,15 +414,15 @@
                                     <textarea name="address" id="addressInput" rows="2" class="form-control" placeholder="Nhập tên đường, phường/xã..." required autocomplete="off"></textarea>
                                     <ul id="suggestions" class="suggestions-list"></ul>
                                 </div>
-                                <div id="map" class="mb-3"></div>
+                                <div id="map"></div>
                                 <p class="text-muted small fst-italic">* Chọn trên bản đồ hoặc danh sách gợi ý.</p>
                                 <button type="submit" class="btn btn-warning text-white w-100 fw-bold">Lưu Địa Chỉ Mới</button>
                             </form>
                         </div>
 
-                        <%-- TAB 3: ĐƠN HÀNG (Table Bootstrap) --%>
+                        <%-- TAB 3: ĐƠN HÀNG (Table Bootstrap Responsive) --%>
                         <div id="tab-orders" class="tab-content-section">
-                            <h4 class="text-uppercase border-bottom pb-2 mb-4 text-center text-warning fw-bold">Đơn Hàng Của Bạn</h4>
+                            <h4 class="section-header">Đơn Hàng Của Bạn</h4>
                             <c:choose>
                                 <c:when test="${empty requestScope.orderList}">
                                     <p class="text-center py-4 text-muted">Chưa có đơn hàng nào.</p>
@@ -246,10 +442,10 @@
                                             <tbody>
                                                 <c:forEach var="o" items="${requestScope.orderList}">
                                                     <tr>
-                                                        <td class="fw-bold">#${o.id}</td>
-                                                        <td><fmt:formatDate value="${o.orderDate}" pattern="dd/MM/yyyy"/></td>
-                                                        <td class="fw-bold text-danger"><fmt:formatNumber value="${o.totalPrice}" pattern="#,###"/> đ</td>
-                                                        <td>
+                                                        <td data-label="Mã ĐH" class="fw-bold">#${o.id}</td>
+                                                        <td data-label="Ngày đặt"><fmt:formatDate value="${o.orderDate}" pattern="dd/MM/yyyy"/></td>
+                                                        <td data-label="Tổng tiền" class="fw-bold text-danger"><fmt:formatNumber value="${o.totalPrice}" pattern="#,###"/> đ</td>
+                                                        <td data-label="Trạng thái">
                                                             <span class="badge rounded-pill badge-status 
                                                                 ${o.status == 'Giao hàng thành công' ? 'bg-success' : 
                                                                 (o.status == 'Đang giao hàng' ? 'bg-primary' : 
@@ -258,11 +454,11 @@
                                                                 ${o.status}
                                                             </span>
                                                         </td>
-                                                        <td>
+                                                        <td data-label="">
                                                             <div class="d-flex justify-content-center gap-2">
                                                                 <button class="btn btn-sm btn-info text-white" onclick="viewOrderDetails('${o.id}', '${o.address}', '${o.paymentMethod}', '${o.note}')">Chi tiết</button>
                                                                 <c:if test="${o.status == 'Chờ thanh toán'}">
-                                                                    <a href="payment_qr.jsp?orderId=48&amp;amount=135000.0" class="btn btn-sm btn-green">Thanh toán</a>
+                                                                    <a href="payment_qr.jsp?orderId=${o.id}&amount=${o.totalPrice}" class="btn btn-sm btn-success">Thanh toán</a>
                                                                 </c:if>
                                                             </div>
                                                         </td>
@@ -277,7 +473,7 @@
 
                         <%-- TAB 4: ĐỔI MẬT KHẨU --%>
                         <div id="tab-password" class="tab-content-section">
-                            <h4 class="text-uppercase border-bottom pb-2 mb-4 text-center text-warning fw-bold">Đổi Mật Khẩu</h4>
+                            <h4 class="section-header">Đổi Mật Khẩu</h4>
                             <form action="${pageContext.request.contextPath}/changePassword" method="post" class="mx-auto" style="max-width: 400px;">
                                 <div class="mb-3">
                                     <label class="form-label fw-bold">Mật khẩu cũ</label>
@@ -327,30 +523,53 @@
 
     <footer>
         <div class="container">
-            <p>&copy; 2025 Quán Cà Phê Vĩnh Long</p>
+            <p>&copy; 2025 Quán Cà Phê Vĩnh Long. Đồ án môn học Công Nghệ Thông Tin 1.</p>
+            <p>Sinh viên thực hiện: Phan Tuấn Cảnh - Võ Phúc Nguyên</p>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
+        // --- TOAST NOTIFICATION ---
+        // Hàm đóng toast ngay lập tức khi bấm nút X
+    function closeToast(button) {
+        const toast = button.closest('.vue-toast');
+        toast.classList.add('toast-hide');
+        setTimeout(() => toast.remove(), 500); // Đợi hiệu ứng bay ra xong mới xóa DOM
+    }
+
+    // Tự động đóng sau 3 giây
+    document.addEventListener("DOMContentLoaded", function() {
+        const toasts = document.querySelectorAll('.vue-toast[data-autohide="true"]');
+        
+        toasts.forEach(toast => {
+            setTimeout(() => {
+                // Thêm class để kích hoạt animation bay ra
+                toast.classList.add('toast-hide');
+                
+                // Xóa khỏi DOM sau khi animation kết thúc (0.5s)
+                setTimeout(() => {
+                    toast.remove();
+                }, 500);
+            }, 3000); // 3000ms = 3 giây
+        });
+    });
+
         // --- XỬ LÝ TAB ---
         function handleTabClick(tabName) {
             const alerts = document.querySelectorAll('.alert');
-            alerts.forEach(alert => alert.style.display = 'none'); // Ẩn thông báo cũ
+            alerts.forEach(alert => alert.style.display = 'none'); 
             showTab(tabName);
         }
 
         function showTab(name) {
-            // Xóa active cũ
             document.querySelectorAll('.tab-content-section').forEach(el => el.classList.remove('active-section'));
             document.querySelectorAll('.list-group-item').forEach(el => el.classList.remove('active'));
             
-            // Active mới
             document.getElementById('tab-' + name).classList.add('active-section');
             document.getElementById('nav-' + name).classList.add('active');
             
-            // Fix lỗi hiển thị map
             if(name === 'addresses' && map) { setTimeout(() => { map.invalidateSize(); }, 200); }
         }
 
@@ -405,8 +624,7 @@
                 .then(data => { document.getElementById('addressInput').value = data.display_name || `\${e.latlng.lat}, \${e.latlng.lng}`; });
         });
 
-        // --- MODAL CHI TIẾT (SỬ DỤNG BOOTSTRAP MODAL API) ---
-        // Khởi tạo đối tượng Modal
+        // --- MODAL CHI TIẾT ---
         const orderModal = new bootstrap.Modal(document.getElementById('orderModal'));
 
         function viewOrderDetails(id, address, payment, note) {
@@ -417,24 +635,18 @@
             document.getElementById('modalPayment').innerText = payText || 'Không rõ';
             document.getElementById('modalNote').innerText = note ? note : 'Không có';
 
-            // Reset loading
             document.getElementById('modalOrderItems').innerHTML = '<div class="spinner-border text-warning" role="status"><span class="visually-hidden">Loading...</span></div>';
-
-            // Mở Modal
             orderModal.show();
             
-            // Ajax Load Data
             fetch('${pageContext.request.contextPath}/order-detail?id=' + id)
                 .then(res => res.text())
                 .then(html => { 
-                    // Thêm class table của Bootstrap vào HTML trả về để đẹp hơn (Optional)
                     const tableHtml = html.replace('<table', '<table class="table table-striped table-sm"');
                     document.getElementById('modalOrderItems').innerHTML = tableHtml; 
                 })
                 .catch(() => { document.getElementById('modalOrderItems').innerHTML = '<p class="text-danger">Lỗi tải dữ liệu!</p>'; });
         }
 
-        // Tự động mở tab từ URL
         const params = new URLSearchParams(window.location.search);
         if(params.get('tab')) showTab(params.get('tab'));
     </script>

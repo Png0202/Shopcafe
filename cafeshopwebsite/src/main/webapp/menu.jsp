@@ -206,13 +206,8 @@
                                     <img src="${product.imageUrl}" class="card-img-top" alt="${product.name}" 
                                         onerror="this.src='https://placehold.co/400x200?text=${product.name}'">
                                 </div>
-                                
                                 <div class="card-body d-flex flex-column text-center">
                                     <h5 class="card-title fw-bold" style="color: #333;">${product.name}</h5>
-                                    <p class="card-text text-muted small flex-grow-1 text-truncate-2">
-                                        ${product.description}
-                                    </p>
-                                    
                                     <div class="mt-3">
                                         <div class="price-tag mb-3">
                                             <fmt:formatNumber value="${product.price}" type="number" pattern="#,###"/> ₫
