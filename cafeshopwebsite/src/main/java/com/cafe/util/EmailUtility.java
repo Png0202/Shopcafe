@@ -21,6 +21,9 @@ public class EmailUtility {
         props.put("mail.smtp.host", HOST_NAME);
         props.put("mail.smtp.port", TSL_PORT);
 
+        props.put("mail.smtp.ssl.protocols", "TLSv1.2"); 
+        props.put("mail.smtp.ssl.trust", "smtp.gmail.com");
+
         Session session = Session.getInstance(props, new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
