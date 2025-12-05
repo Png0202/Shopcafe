@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import com.cafe.util.DBConnection;
 import com.cafe.util.EmailUtility;
 import com.cafe.util.PasswordUtil;
+import java.net.URLEncoder;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

@@ -19,9 +19,19 @@
         <h3 class="text-center fw-bold mb-4" style="color: #6f4e37;">Khôi Phục Mật Khẩu</h3>
 
         <%-- THÔNG BÁO LỖI --%>
-        <c:if test="${param.error == 'email_not_found'}"><div class="alert alert-danger small">Email không tồn tại trong hệ thống!</div></c:if>
-        <c:if test="${param.error == 'wrong_otp'}"><div class="alert alert-danger small">Mã xác nhận không đúng!</div></c:if>
-        <c:if test="${param.error == 'mismatch'}"><div class="alert alert-danger small">Mật khẩu xác nhận không khớp!</div></c:if>
+        <c:if test="${param.error == 'email_not_found'}">
+            <div class="alert alert-danger">Email không tồn tại!</div>
+        </c:if>
+
+        <c:if test="${param.error == 'system'}">
+            <div class="alert alert-danger">Lỗi hệ thống! Vui lòng thử lại.</div>
+        </c:if>
+
+        <c:if test="${param.error != null && param.error != 'email_not_found' && param.error != 'system' && param.error != 'wrong_otp'}">
+            <div class="alert alert-danger">
+                <strong>Lỗi chi tiết:</strong> <c:out value="${param.error}" />
+            </div>
+        </c:if>
 
         <%-- STEP 1: NHẬP EMAIL --%>
         <c:if test="${empty param.step}">
