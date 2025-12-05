@@ -11,7 +11,7 @@ public class EmailUtility {
     private static final String HOST_NAME = "smtp.gmail.com";
     private static final int TSL_PORT = 587;
     private static final String APP_EMAIL = "vpn24112003@gmail.com"; 
-    private static final String APP_PASSWORD = "kyzi orsu lorv hqaf"; 
+    private static final String APP_PASSWORD = "bbhy vwpm romh pgmp"; 
 
     // Hàm gửi Email
     public static void sendEmail(String toAddress, String subject, String message) throws MessagingException {
