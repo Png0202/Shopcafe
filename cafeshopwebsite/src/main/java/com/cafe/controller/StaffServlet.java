@@ -42,7 +42,10 @@ public class StaffServlet extends HttpServlet {
             // --- 1. AJAX: CẬP NHẬT ĐƠN ONLINE (POLLING) ---
             if ("get_online_orders_ajax".equals(action)) {
                 response.setContentType("text/html;charset=UTF-8");
-                String sqlOrder = "SELECT o.*, u.name AS user_name FROM orders o JOIN users u ON o.user_email = u.email WHERE o.order_type = 'online' ORDER BY o.order_date DESC";
+                String sqlOrder = "SELECT o.*, u.name AS user_name FROM orders o " +
+                                  "JOIN users u ON o.user_email = u.email " +
+                                  "WHERE o.order_type = 'online' AND o.status != 'Đã hủy' " + 
+                                  "ORDER BY o.order_date DESC";
                 PreparedStatement psOrder = conn.prepareStatement(sqlOrder);
                 ResultSet rsOrder = psOrder.executeQuery();
                 StringBuilder html = new StringBuilder();

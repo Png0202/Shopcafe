@@ -260,7 +260,7 @@
                                     <%-- CÁC NÚT BẤM --%>
                                     <div class="d-grid gap-2">
                                         <a href="${pageContext.request.contextPath}/checkout" class="btn btn-success py-2 fw-bold">
-                                            <i class="fa-solid fa-credit-card me-2"></i>THANH TOÁN NGAY
+                                            <i class="fa-solid fa-credit-card me-2"></i>ĐẶT HÀNG NGAY
                                         </a>
                                         
                                         <div class="row g-2">

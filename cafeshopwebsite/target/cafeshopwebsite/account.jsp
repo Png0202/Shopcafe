@@ -83,7 +83,6 @@
         .modal-content { 
             background: white; 
             margin: 5% auto; 
-            padding: 20px; 
             border-radius: 8px; 
             position: relative; 
             max-height: 90vh; 
@@ -100,7 +99,6 @@
                 width: 95% !important;
                 max-width: 95% !important;
                 margin: 15% auto;
-                padding: 15px;
                 max-height: 80vh;
                 box-sizing: border-box;
                 overflow-x: hidden; /* Khóa kéo ngang của khung Modal */
@@ -236,7 +234,7 @@
                             <i class="fa-solid fa-user me-2"></i> Thông tin tài khoản
                         </a>
                         <a onclick="showTab('addresses')" id="nav-addresses" class="list-group-item list-group-item-action">
-                            <i class="fa-solid fa-location-dot me-2"></i> Sổ địa chỉ (${empty requestScope.addressCount ? 0 : requestScope.addressCount})
+                            <i class="fa-solid fa-location-dot me-2"></i> Địa chỉ (${empty requestScope.addressCount ? 0 : requestScope.addressCount})
                         </a>
                         <a onclick="showTab('orders')" id="nav-orders" class="list-group-item list-group-item-action">
                             <i class="fa-solid fa-box me-2"></i> Đơn hàng của bạn
@@ -257,8 +255,6 @@
                     <div class="card-body p-4">
                         <%-- Thông báo --%>
                         <div id="toast-container">
-                            
-                            <%-- THÀNH CÔNG --%>
                             <c:if test="${param.status == 'success'}">
                                 <div class="vue-toast" data-autohide="true">
                                     <div class="vue-toast-icon"><i class="fa-solid fa-check-circle"></i></div>
@@ -287,6 +283,23 @@
                                 <div class="vue-toast error" data-autohide="true">
                                     <div class="vue-toast-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
                                     <div class="vue-toast-body">Số điện thoại này đã được sử dụng bởi tài khoản khác!</div>
+                                    <button class="vue-toast-close" onclick="closeToast(this)">×</button>
+                                    <div class="vue-toast-progress"></div>
+                                </div>
+                            </c:if>
+                            <c:if test="${param.status == 'cancelled'}">
+                                <div class="vue-toast" data-autohide="true">
+                                    <div class="vue-toast-icon"><i class="fa-solid fa-ban"></i></div>
+                                    <div class="vue-toast-body">Đã hủy đơn hàng thành công!</div>
+                                    <button class="vue-toast-close" onclick="closeToast(this)">×</button>
+                                    <div class="vue-toast-progress"></div>
+                                </div>
+                            </c:if>
+                            
+                            <c:if test="${param.error == 'cancel_failed'}">
+                                <div class="vue-toast error" data-autohide="true">
+                                    <div class="vue-toast-icon"><i class="fa-solid fa-circle-xmark"></i></div>
+                                    <div class="vue-toast-body">Không thể hủy đơn hàng này!<br><small>(Đơn đã được giao hoặc không tồn tại)</small></div>
                                     <button class="vue-toast-close" onclick="closeToast(this)">×</button>
                                     <div class="vue-toast-progress"></div>
                                 </div>
@@ -360,14 +373,14 @@
 
                             <div class="text-center mt-4">
                                 <a onclick="showTab('addresses')" class="text-decoration-none text-warning fw-bold" style="cursor:pointer;">
-                                    Quản lý sổ địa chỉ <i class="fa-solid fa-arrow-right"></i>
+                                    Quản lý địa chỉ <i class="fa-solid fa-arrow-right"></i>
                                 </a>
                             </div>
                         </div>
 
-                        <%-- TAB 2: SỔ ĐỊA CHỈ --%>
+                        <%-- TAB 2: ĐỊA CHỈ --%>
                         <div id="tab-addresses" class="tab-content-section">
-                            <h4 class="section-header">Sổ Địa Chỉ</h4>
+                            <h4 class="section-header">Địa Chỉ</h4>
                             
                             <div class="mb-4">
                                 <c:choose>
@@ -455,13 +468,23 @@
                                                             </span>
                                                         </td>
                                                         <td data-label="">
-                                                            <div class="d-flex justify-content-center gap-2">
+                                                        <div class="d-flex flex-column align-items-center gap-2">
+                                                            
+                                                            <div class="d-flex gap-2">
                                                                 <button class="btn btn-sm btn-info text-white" onclick="viewOrderDetails('${o.id}', '${o.address}', '${o.paymentMethod}', '${o.note}')">Chi tiết</button>
+                                                                
                                                                 <c:if test="${o.status == 'Chờ thanh toán'}">
                                                                     <a href="payment_qr.jsp?orderId=${o.id}&amount=${o.totalPrice}" class="btn btn-sm btn-success">Thanh toán</a>
                                                                 </c:if>
                                                             </div>
-                                                        </td>
+
+                                                            <c:if test="${o.status == 'Chờ thanh toán' || o.status == 'Đang xử lý'}">
+                                                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="openCancelModal('${o.id}')" style="min-width: 100px;">
+                                                                    <i class="fa-solid fa-xmark me-1"></i> Hủy đơn
+                                                                </button>
+                                                            </c:if>
+                                                        </div>
+                                                    </td>
                                                     </tr>
                                                 </c:forEach>
                                             </tbody>
@@ -520,6 +543,41 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fa-solid fa-circle-exclamation me-2"></i>Xác Nhận Hủy Đơn
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                
+                <div class="modal-body text-center py-4">
+                    <div class="mb-3">
+                        <i class="fa-solid fa-trash-can text-danger fa-4x"></i>
+                    </div>
+                    <h5 class="fw-bold">Bạn có chắc chắn muốn hủy đơn hàng này?</h5>
+                    <p class="text-muted">
+                        Đơn hàng <strong id="displayCancelOrderId" class="text-danger"></strong> sẽ bị hủy bỏ và không thể khôi phục.
+                    </p>
+                </div>
+                
+                <div class="modal-footer justify-content-center border-0 bg-light">
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-danger px-4 fw-bold" onclick="submitCancelForm()">
+                        <i class="fa-solid fa-xmark me-2"></i>Đồng Ý
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form id="cancelOrderForm" action="${pageContext.request.contextPath}/profile" method="post" class="d-none">
+        <input type="hidden" name="action" value="cancel_order">
+        <input type="hidden" name="orderId" id="inputCancelOrderId">
+    </form>
 
     <footer>
         <div class="container">
@@ -623,6 +681,24 @@
                 .then(res => res.json())
                 .then(data => { document.getElementById('addressInput').value = data.display_name || `\${e.latlng.lat}, \${e.latlng.lng}`; });
         });
+
+        // --- LOGIC HỦY ĐƠN HÀNG (MODAL) ---
+        const cancelModal = new bootstrap.Modal(document.getElementById('cancelOrderModal'));
+        
+        // 1. Hàm mở modal khi bấm nút "Hủy đơn"
+        function openCancelModal(orderId) {
+            // Gán ID vào text hiển thị
+            document.getElementById('displayCancelOrderId').innerText = '#' + orderId;
+            // Gán ID vào form ẩn
+            document.getElementById('inputCancelOrderId').value = orderId;
+            // Hiển thị modal
+            cancelModal.show();
+        }
+
+        // 2. Hàm gửi form khi bấm "Đồng ý hủy"
+        function submitCancelForm() {
+            document.getElementById('cancelOrderForm').submit();
+        }
 
         // --- MODAL CHI TIẾT ---
         const orderModal = new bootstrap.Modal(document.getElementById('orderModal'));

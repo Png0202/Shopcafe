@@ -194,41 +194,42 @@
                             </thead>
                             <tbody>
                                 <c:forEach var="o" items="${onlineOrders}">
-                                    <tr>
-                                        <td class="fw-bold">#${o.id}</td>
-                                        <td class="fw-bold text-center">${o.userEmail}</td>
-                                        <td><fmt:formatDate value="${o.orderDate}" pattern="dd/MM/yyyy HH:mm"/></td>
-                                        <td class="fw-bold text-warning"><fmt:formatNumber value="${o.totalPrice}" pattern="#,###"/> đ</td>
-                                        <td>
-                                            <span class="badge rounded-pill 
-                                                ${o.status == 'Giao hàng thành công' ? 'bg-success' : 
-                                                (o.status == 'Đang giao hàng' ? 'bg-primary' : 
-                                                (o.status == 'Đã hủy' ? 'bg-danger' : 
-                                                (o.status == 'Chờ thanh toán' ? 'bg-secondary' : 'bg-warning text-dark')))}">
-                                                ${o.status}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <div class="d-flex justify-content-center gap-2">
-                                                <button class="btn btn-sm btn-info text-white fw-bold" onclick="viewOrderDetail('${o.id}', '${o.address}', '${o.paymentMethod}', '${o.note}')">
-                                                    <i class="fa-solid fa-eye"></i> Xem
-                                                </button>
-                                                
-                                                <c:if test="${o.status == 'Chờ thanh toán'}">
+                                    <c:if test="${o.status != 'Đã hủy'}">
+                                        <tr>
+                                            <td class="fw-bold">#${o.id}</td>
+                                            <td class="fw-bold text-center">${o.userEmail}</td>
+                                            <td><fmt:formatDate value="${o.orderDate}" pattern="dd/MM/yyyy HH:mm"/></td>
+                                            <td class="fw-bold text-warning"><fmt:formatNumber value="${o.totalPrice}" pattern="#,###"/> đ</td>
+                                            <td>
+                                                <span class="badge rounded-pill 
+                                                    ${o.status == 'Giao hàng thành công' ? 'bg-success' : 
+                                                    (o.status == 'Đang giao hàng' ? 'bg-primary' : 
+                                                    (o.status == 'Đã hủy' ? 'bg-danger' : 
+                                                    (o.status == 'Chờ thanh toán' ? 'bg-secondary' : 'bg-warning text-dark')))}">
+                                                    ${o.status}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex justify-content-center gap-2">
+                                                    <button class="btn btn-sm btn-info text-white fw-bold" onclick="viewOrderDetail('${o.id}', '${o.address}', '${o.paymentMethod}', '${o.note}')">
+                                                        <i class="fa-solid fa-eye"></i> Xem
+                                                    </button>
+                                                    
+                                                    <c:if test="${o.status == 'Đang xử lý'}">
+                                                        <button class="btn btn-sm btn-green fw-bold" onclick="updateStatus('${o.id}', 'Đang giao hàng')">
+                                                            <i class="fa-solid fa-truck-fast"></i> Giao hàng
+                                                        </button>
                                                     </c:if>
-                                                <c:if test="${o.status == 'Đang xử lý'}">
-                                                    <button class="btn btn-sm btn-green fw-bold" onclick="updateStatus('${o.id}', 'Đang giao hàng')">
-                                                        <i class="fa-solid fa-truck-fast"></i> Giao hàng
-                                                    </button>
-                                                </c:if>
-                                                <c:if test="${o.status == 'Đang giao hàng'}">
-                                                    <button class="btn btn-sm btn-green fw-bold" onclick="updateStatus('${o.id}', 'Giao hàng thành công')">
-                                                        <i class="fa-solid fa-check-circle"></i> Hoàn tất
-                                                    </button>
-                                                </c:if>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                                    
+                                                    <c:if test="${o.status == 'Đang giao hàng'}">
+                                                        <button class="btn btn-sm btn-green fw-bold" onclick="updateStatus('${o.id}', 'Giao hàng thành công')">
+                                                            <i class="fa-solid fa-check-circle"></i> Hoàn tất
+                                                        </button>
+                                                    </c:if>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </c:if>
                                 </c:forEach>
                             </tbody>
                         </table>
@@ -445,6 +446,37 @@
         </div>
     </div>
 
+    <div class="modal fade" id="statusConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow-lg border-0">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fa-solid fa-circle-question me-2"></i>Xác Nhận Cập Nhật
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                
+                <div class="modal-body text-center py-4">
+                    <div class="mb-3">
+                        <i class="fa-solid fa-truck-fast text-info fa-4x"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark">Cập nhật trạng thái đơn hàng?</h5>
+                    <p class="text-muted mb-0">
+                        Trạng thái mới sẽ được chuyển thành:<br>
+                        <strong class="text-primary fs-5" id="displayNewStatus"></strong>
+                    </p>
+                </div>
+                
+                <div class="modal-footer justify-content-center bg-light border-0">
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Hủy Bỏ</button>
+                    <button type="button" class="btn btn-info px-4 fw-bold text-white" onclick="executeStatusUpdate()">
+                        <i class="fa-solid fa-check me-2"></i>Xác Nhận
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
@@ -501,10 +533,29 @@
             checkoutConfirmModal.hide();
         }
 
-        // === 3. XỬ LÝ ĐƠN ONLINE ===
+        // --- KHAI BÁO BIẾN TOÀN CỤC & MODAL ---
+        let targetOrderId = null;
+        let targetStatus = null;
+        const statusConfirmModal = new bootstrap.Modal(document.getElementById('statusConfirmModal'));
+
+        // 1. Hàm được gọi khi bấm nút Giao hàng/Hoàn tất 
         function updateStatus(orderId, newStatus) {
-            if(confirm('Cập nhật trạng thái thành: ' + newStatus + '?')) {
-                window.location.href = '${pageContext.request.contextPath}/staff?action=update_status&orderId=' + orderId + '&status=' + encodeURIComponent(newStatus);
+            // Lưu thông tin vào biến tạm
+            targetOrderId = orderId;
+            targetStatus = newStatus;
+
+            // Hiển thị tên trạng thái mới lên Modal cho người dùng xem
+            document.getElementById('displayNewStatus').innerText = newStatus;
+
+            // Mở Modal xác nhận
+            statusConfirmModal.show();
+        }
+
+        // 2. Hàm thực thi khi bấm nút "Xác Nhận" trong Modal
+        function executeStatusUpdate() {
+            if (targetOrderId && targetStatus) {
+                // Chuyển hướng server để xử lý cập nhật trạng thái
+                window.location.href = '${pageContext.request.contextPath}/staff?action=update_status&orderId=' + targetOrderId + '&status=' + encodeURIComponent(targetStatus);
             }
         }
 

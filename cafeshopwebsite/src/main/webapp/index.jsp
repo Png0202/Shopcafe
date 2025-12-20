@@ -23,15 +23,6 @@
             margin-bottom: 0;
         }
         
-        /* Hiệu ứng ảnh sản phẩm */
-        .layer-image img {
-            transition: transform 0.5s ease;
-            cursor: pointer;
-        }
-        .layer-image img:hover {
-            transform: scale(1.03);
-        }
-        
         /* Badge Top Ranking */
         .rank-badge {
             position: absolute;

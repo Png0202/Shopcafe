@@ -238,7 +238,7 @@
                     <p class="text-muted mb-0">Vui lòng kiểm tra kỹ <strong>địa chỉ</strong> và <strong>số điện thoại</strong> trước khi hoàn tất.</p>
                 </div>
                 <div class="modal-footer justify-content-center border-0 bg-light rounded-bottom">
-                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Kiểm tra lại</button>
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Hủy</button>
                     
                     <button type="button" class="btn btn-success px-4 fw-bold" onclick="document.getElementById('checkoutForm').submit();">
                         <i class="fa-solid fa-paper-plane me-2"></i>Đặt Hàng Ngay

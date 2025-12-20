@@ -7,16 +7,16 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.cafe.model.Order;
-import com.cafe.model.UserAddress;
-import com.cafe.util.DBConnection;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import com.cafe.model.Order;
+import com.cafe.model.UserAddress;
+import com.cafe.util.DBConnection;
 
 @WebServlet("/profile")
 public class ProfileServlet extends HttpServlet {
@@ -214,7 +214,7 @@ public class ProfileServlet extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/profile?tab=addresses&status=updated");
             }
 
-            // --- 4. CẬP NHẬT SỐ ĐIỆN THOẠI (CÓ KIỂM TRA TRÙNG) ---
+            // --- 4. CẬP NHẬT SỐ ĐIỆN THOẠI ---
             else if ("update_phone".equals(action)) {
                 String phone = request.getParameter("phone");
                 
@@ -243,6 +243,32 @@ public class ProfileServlet extends HttpServlet {
                     }
                     
                     response.sendRedirect(request.getContextPath() + "/profile?status=updated");
+                }
+            }
+
+            // --- 5. HỦY ĐƠN HÀNG (MỚI) ---
+            else if ("cancel_order".equals(action)) {
+                try {
+                    int orderId = Integer.parseInt(request.getParameter("orderId"));
+                    
+                    // Chỉ cho phép hủy nếu đơn hàng của chính user đó VÀ trạng thái là 'Chờ thanh toán' hoặc 'Đang xử lý'
+                    String sql = "UPDATE orders SET status = 'Đã hủy' WHERE id = ? AND user_email = ? AND status IN ('Chờ thanh toán', 'Đang xử lý')";
+                    
+                    try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                        ps.setInt(1, orderId);
+                        ps.setString(2, email);
+                        int rowsUpdated = ps.executeUpdate();
+                        
+                        if (rowsUpdated > 0) {
+                            // Hủy thành công
+                            response.sendRedirect(request.getContextPath() + "/profile?tab=orders&status=cancelled");
+                        } else {
+                            // Không thể hủy (do sai ID hoặc trạng thái đã thay đổi)
+                            response.sendRedirect(request.getContextPath() + "/profile?tab=orders&error=cancel_failed");
+                        }
+                    }
+                } catch (NumberFormatException e) {
+                    response.sendRedirect(request.getContextPath() + "/profile?tab=orders&error=invalid_id");
                 }
             }
 

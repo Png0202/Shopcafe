@@ -269,15 +269,21 @@
                             <button type="submit" class="btn btn-success w-100 py-2 fw-bold">ĐĂNG KÝ NGAY</button>
                         </form>
                     </div>
+
                 </div>
+
                 <hr class="my-4">
+                
                 <div class="text-center mb-3 small text-muted">Hoặc đăng nhập bằng</div>
-                <div class="mb-3">
-                    <a href="https://accounts.google.com/o/oauth2/auth?scope=email profile&redirect_uri=https://shopcafe.onrender.com/login-google&response_type=code&client_id=197666350056-9pqv4650vrejdaurpflk52l6ks65emse.apps.googleusercontent.com&approval_prompt=force" 
-                    class="btn btn-outline-danger social-btn w-100">
-                        <i class="fa-brands fa-google"></i> Google
-                    </a>
+                <div class="row">
+                    <div class="mb-3">
+                        <a href="https://accounts.google.com/o/oauth2/auth?scope=email profile&redirect_uri=http://localhost:8080/cafeshopwebsite/login-google&response_type=code&client_id=176057575812-bcfmitr3b25kar6e6f4sh0sh3v0ertqq.apps.googleusercontent.com&approval_prompt=force" 
+                        class="btn btn-outline-danger social-btn w-100">
+                            <i class="fa-brands fa-google"></i> Google
+                        </a>
+                    </div>
                 </div>
+
             </div>
         </div>
     </section>
