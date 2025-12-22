@@ -216,9 +216,21 @@
                                         <form action="cart" method="post">
                                             <input type="hidden" name="action" value="add">
                                             <input type="hidden" name="productId" value="${product.id}">
-                                            <button type="submit" class="btn btn-add-cart w-100 py-2">
-                                                <i class="fa-solid fa-cart-plus me-2"></i>Thêm Vào Giỏ
-                                            </button>
+                                            <c:choose>
+                                            <%-- Nếu trạng thái là 1 (Đang bán) -> Hiện nút Mua bình thường --%>
+                                            <c:when test="${product.status == 1}">
+                                                <a href="add-to-cart?id=${product.id}" class="btn btn-warning fw-bold">
+                                                    <i class="fa-solid fa-cart-plus"></i> Thêm vào giỏ
+                                                </a>
+                                            </c:when>
+                                            
+                                            <%-- Nếu trạng thái là 0 (Tạm hết) -> Hiện nút Xám và không bấm được --%>
+                                            <c:otherwise>
+                                                <button class="btn btn-secondary fw-bold" disabled style="cursor: not-allowed;">
+                                                    <i class="fa-solid fa-circle-xmark"></i> Tạm hết
+                                                </button>
+                                            </c:otherwise>
+                                        </c:choose>
                                         </form>
                                     </div>
                                 </div>
