@@ -265,12 +265,12 @@
                         
                         <div class="mb-3">
                             <label class="form-label fw-bold">Họ Tên</label>
-                            <input type="text" name="fullname" id="modalName" class="form-control" required>
+                            <input type="text" name="fullname" id="modalName" class="form-control" disabled>
                         </div>
                         
                         <div class="mb-3">
                             <label class="form-label fw-bold">Email</label>
-                            <input type="email" name="email" id="modalEmail" class="form-control" required>
+                            <input type="email" name="email" id="modalEmail" class="form-control" disabled>
                         </div>
                         
                         <div class="mb-3">

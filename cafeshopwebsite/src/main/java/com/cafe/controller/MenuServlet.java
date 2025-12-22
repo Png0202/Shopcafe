@@ -132,7 +132,8 @@ public class MenuServlet extends HttpServlet {
                     rs.getString("description"),
                     rs.getDouble("price"),
                     rs.getString("category"),
-                    rs.getString("image_url")
+                    rs.getString("image_url"),
+                    rs.getInt("status")
                 );
                 productList.add(p);
             }

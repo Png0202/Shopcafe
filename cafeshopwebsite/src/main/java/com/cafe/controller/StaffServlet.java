@@ -78,6 +78,12 @@ public class StaffServlet extends HttpServlet {
                     html.append("<button class='btn btn-sm btn-info text-white fw-bold' onclick=\"viewOrderDetail('")
                         .append(id).append("', '").append(address).append("', '").append(payment).append("', '").append(note).append("')\"><i class='fa-solid fa-eye'></i> Xem</button> ");
                     
+                    if ("Chờ thanh toán".equals(status) || "Đang xử lý".equals(status)) {
+                        html.append("<button class='btn btn-sm btn-danger fw-bold ms-1' onclick=\"updateStatus('")
+                            .append(id)
+                            .append("', 'Đã hủy')\"><i class='fa-solid fa-ban'></i> Hủy</button>");
+                    }
+
                     if ("Chờ thanh toán".equals(status)) {
                     } else if ("Đang xử lý".equals(status)) {
                         html.append("<button class='btn btn-sm btn-green fw-bold' onclick=\"updateStatus('").append(id).append("', 'Đang giao hàng')\"><i class='fa-solid fa-truck-fast'></i> Giao hàng</button>");
@@ -178,7 +184,8 @@ public class StaffServlet extends HttpServlet {
                     rsProd.getString("description"),
                     rsProd.getDouble("price"),
                     rsProd.getString("category"),
-                    rsProd.getString("image_url")
+                    rsProd.getString("image_url"),
+                    rsProd.getInt("status")
                 ));
             }
             request.setAttribute("productList", productList);
@@ -296,6 +303,21 @@ public class StaffServlet extends HttpServlet {
                 ps.setInt(1, id);
                 ps.executeUpdate();
                 response.sendRedirect("staff?tab=menu&status=deleted");
+            }
+            // --- 6. KHÓA / MỞ MÓN ĂN ---
+            else if ("toggle_product_status".equals(action)) {
+                int id = Integer.parseInt(request.getParameter("id"));
+                int currentStatus = Integer.parseInt(request.getParameter("currentStatus"));
+                
+                // Đảo ngược trạng thái: Nếu đang 1 (Bán) -> thành 0 (Hết) và ngược lại
+                int newStatus = (currentStatus == 1) ? 0 : 1;
+                
+                try (PreparedStatement ps = conn.prepareStatement("UPDATE products SET status = ? WHERE id = ?")) {
+                    ps.setInt(1, newStatus);
+                    ps.setInt(2, id);
+                    ps.executeUpdate();
+                }
+                response.sendRedirect("staff?tab=menu&status=updated");
             }
 
         } catch (Exception e) {

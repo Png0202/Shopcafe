@@ -7,14 +7,14 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.cafe.model.Product;
-import com.cafe.util.DBConnection;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.cafe.model.Product;
+import com.cafe.util.DBConnection;
 
 // Servlet này sẽ chạy khi người dùng vào trang chủ "/"
 @WebServlet("/home")
@@ -58,7 +58,8 @@ public class HomeServlet extends HttpServlet {
                     rs.getString("description"),
                     rs.getDouble("price"),
                     rs.getString("category"),
-                    rs.getString("image_url")
+                    rs.getString("image_url"),
+                    rs.getInt("status")
                 ));
             }
 
