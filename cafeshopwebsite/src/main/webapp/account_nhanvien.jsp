@@ -214,7 +214,11 @@
                                                     <button class="btn btn-sm btn-info text-white fw-bold" onclick="viewOrderDetail('${o.id}', '${o.address}', '${o.paymentMethod}', '${o.note}')">
                                                         <i class="fa-solid fa-eye"></i> Xem
                                                     </button>
-                                                    
+                                                    <c:if test="${o.status == 'Chờ thanh toán' || o.status == 'Đang xử lý'}">
+                                                        <button class="btn btn-sm btn-danger fw-bold ms-1" onclick="updateStatus('${o.id}', 'Đã hủy')">
+                                                            <i class="fa-solid fa-ban"></i> Hủy
+                                                        </button>
+                                                    </c:if>
                                                     <c:if test="${o.status == 'Đang xử lý'}">
                                                         <button class="btn btn-sm btn-green fw-bold" onclick="updateStatus('${o.id}', 'Đang giao hàng')">
                                                             <i class="fa-solid fa-truck-fast"></i> Giao hàng
@@ -256,6 +260,7 @@
                                     <th>Tên món</th>
                                     <th>Danh mục</th>
                                     <th>Giá</th>
+                                    <th>Trạng thái</th>
                                     <th class="text-center">Hành động</th>
                                 </tr>
                             </thead>
@@ -270,17 +275,35 @@
                                         <td class="fw-bold">${p.name}</td>
                                         <td><span class="badge bg-secondary">${p.category}</span></td>
                                         <td class="text-danger fw-bold"><fmt:formatNumber value="${p.price}" pattern="#,###"/> đ</td>
+                                        <%-- CỘT TRẠNG THÁI --%>
+                                        <td>
+                                            <c:choose>
+                                                <c:when test="${p.status == 1}">
+                                                    <span class="badge bg-success">Đang bán</span>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <span class="badge bg-secondary">Tạm hết</span>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </td>
                                         <td class="text-center">
+                                            <%-- NÚT KHÓA / MỞ KHÓA (Đã sửa lỗi xuống dòng) --%>
+                                            <button class="btn btn-sm ${p.status == 1 ? 'btn-outline-dark' : 'btn-outline-success'} me-2" 
+                                                    onclick="toggleProductStatus('${p.id}', ${p.status})" 
+                                                    title="${p.status == 1 ? 'Khóa món này' : 'Mở bán lại'}">
+                                                <i class="fa-solid ${p.status == 1 ? 'fa-lock' : 'fa-lock-open'}"></i>
+                                            </button>
+
+                                            <%-- Nút Sửa --%>
                                             <button class="btn btn-sm btn-warning me-2" 
-                                                    onclick="editProduct('${p.id}', '${p.name}', '${p.description}', '${p.price}', '${p.category}', '${p.imageUrl}')">
+                                                onclick="editProduct('${p.id}', '${p.name}', '${p.description}', '${p.price}', '${p.category}', '${p.imageUrl}')">
                                                 <i class="fa-solid fa-pen"></i>
                                             </button>
                                             
-                                            <form action="staff" method="post" class="d-inline" onsubmit="return confirm('Bạn chắc chắn muốn xóa món này?');">
-                                                <input type="hidden" name="action" value="delete_product">
-                                                <input type="hidden" name="id" value="${p.id}">
-                                                <button class="btn btn-sm btn-danger"><i class="fa-solid fa-trash"></i></button>
-                                            </form>
+                                            <%-- Nút Xóa --%>
+                                            <button class="btn btn-sm btn-danger" onclick="openDeleteModal('${p.id}', '${p.name}')">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
                                         </td>
                                     </tr>
                                 </c:forEach>
@@ -449,7 +472,7 @@
     <div class="modal fade" id="statusConfirmModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content shadow-lg border-0">
-                <div class="modal-header bg-info text-white">
+                <div class="modal-header bg-info text-white" id="statusModalHeader">
                     <h5 class="modal-title fw-bold">
                         <i class="fa-solid fa-circle-question me-2"></i>Xác Nhận Cập Nhật
                     </h5>
@@ -458,7 +481,7 @@
                 
                 <div class="modal-body text-center py-4">
                     <div class="mb-3">
-                        <i class="fa-solid fa-truck-fast text-info fa-4x"></i>
+                        <i class="fa-solid fa-truck-fast text-info fa-4x" id="statusModalIcon"></i>
                     </div>
                     <h5 class="fw-bold text-dark">Cập nhật trạng thái đơn hàng?</h5>
                     <p class="text-muted mb-0">
@@ -469,13 +492,47 @@
                 
                 <div class="modal-footer justify-content-center bg-light border-0">
                     <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Hủy Bỏ</button>
-                    <button type="button" class="btn btn-info px-4 fw-bold text-white" onclick="executeStatusUpdate()">
+                    <button type="button" class="btn btn-info px-4 fw-bold text-white" id="btnConfirmStatus" onclick="executeStatusUpdate()">
                         <i class="fa-solid fa-check me-2"></i>Xác Nhận
                     </button>
                 </div>
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="deleteProductModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow-lg border-0">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fa-solid fa-triangle-exclamation me-2"></i>Xác Nhận Xóa
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                
+                <div class="modal-body text-center py-4">
+                    <div class="mb-3">
+                        <i class="fa-solid fa-trash-can text-danger fa-4x"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark">Bạn có chắc chắn muốn xóa?</h5>
+                    <p class="text-muted mb-0">
+                        Món <strong id="deleteProductName" class="text-danger"></strong> sẽ bị xóa vĩnh viễn khỏi thực đơn.
+                    </p>
+                </div>
+                
+                <div class="modal-footer justify-content-center bg-light border-0">
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Hủy Bỏ</button>
+                    <button type="button" class="btn btn-danger px-4 fw-bold" onclick="executeDeleteProduct()">
+                        <i class="fa-solid fa-trash me-2"></i>Xóa Ngay
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <form id="deleteProductForm" action="staff" method="post" class="d-none">
+        <input type="hidden" name="action" value="delete_product">
+        <input type="hidden" name="id" id="inputDeleteProductId">
+    </form>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -538,16 +595,35 @@
         let targetStatus = null;
         const statusConfirmModal = new bootstrap.Modal(document.getElementById('statusConfirmModal'));
 
-        // 1. Hàm được gọi khi bấm nút Giao hàng/Hoàn tất 
         function updateStatus(orderId, newStatus) {
-            // Lưu thông tin vào biến tạm
+            // Lưu biến tạm
             targetOrderId = orderId;
             targetStatus = newStatus;
 
-            // Hiển thị tên trạng thái mới lên Modal cho người dùng xem
-            document.getElementById('displayNewStatus').innerText = newStatus;
+            // Lấy các phần tử giao diện
+            const header = document.getElementById('statusModalHeader');
+            const icon = document.getElementById('statusModalIcon');
+            const btn = document.getElementById('btnConfirmStatus');
+            const statusText = document.getElementById('displayNewStatus');
 
-            // Mở Modal xác nhận
+            statusText.innerText = newStatus;
+
+            // KIỂM TRA: Nếu là HỦY ĐƠN thì đổi sang màu ĐỎ
+            if (newStatus === 'Đã hủy') {
+                // Style ĐỎ (Danger)
+                header.className = 'modal-header bg-danger text-white';
+                icon.className = 'fa-solid fa-trash-can text-danger fa-4x'; // Icon thùng rác
+                btn.className = 'btn btn-danger px-4 fw-bold';
+                statusText.className = 'text-danger fs-5 fw-bold';
+            } else {
+                // Style XANH (Info) - Mặc định
+                header.className = 'modal-header bg-info text-white';
+                icon.className = 'fa-solid fa-truck-fast text-info fa-4x'; // Icon xe tải
+                btn.className = 'btn btn-info px-4 fw-bold text-white';
+                statusText.className = 'text-primary fs-5';
+            }
+
+            // Mở Modal
             statusConfirmModal.show();
         }
 
@@ -626,6 +702,53 @@
             else if (activeTab === 'menu') showTab('menu');
             else showTab('pos');
         });
+        // --- 6. KHÓA / MỞ MÓN ---
+        function toggleProductStatus(id, currentStatus) {
+            // Tạo form ẩn để gửi yêu cầu
+            const form = document.createElement('form');
+            form.method = 'post';
+            form.action = 'staff';
+
+            const inputAction = document.createElement('input');
+            inputAction.type = 'hidden';
+            inputAction.name = 'action';
+            inputAction.value = 'toggle_product_status';
+
+            const inputId = document.createElement('input');
+            inputId.type = 'hidden';
+            inputId.name = 'id';
+            inputId.value = id;
+
+            const inputStatus = document.createElement('input');
+            inputStatus.type = 'hidden';
+            inputStatus.name = 'currentStatus';
+            inputStatus.value = currentStatus;
+
+            form.appendChild(inputAction);
+            form.appendChild(inputId);
+            form.appendChild(inputStatus);
+            document.body.appendChild(form);
+            
+            form.submit();
+        }
+        // --- 7. XỬ LÝ XÓA MÓN ĂN (MODAL) ---
+        const deleteProductModal = new bootstrap.Modal(document.getElementById('deleteProductModal'));
+
+        function openDeleteModal(id, name) {
+            // Hiển thị tên món ăn lên Modal cho người dùng dễ check
+            document.getElementById('deleteProductName').innerText = name;
+            
+            // Gán ID vào form ẩn
+            document.getElementById('inputDeleteProductId').value = id;
+            
+            // Mở Modal
+            deleteProductModal.show();
+        }
+
+        function executeDeleteProduct() {
+            // Submit form ẩn
+            document.getElementById('deleteProductForm').submit();
+        }
     </script>
 </body>
 </html>
