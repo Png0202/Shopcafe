@@ -141,7 +141,7 @@ public class ChatServlet extends HttpServlet {
                     if (unread > 0) hasUnreadGlobal = true;
 
                     // Highlight nền nếu có tin chưa đọc
-                    String bgClass = (unread > 0) ? "bg-light border-start border-5 border-danger" : "";
+                    String bgClass = (unread > 0) ? "bg-light" : "";
                     String fwClass = (unread > 0) ? "fw-bold text-dark" : "text-secondary";
 
                     // Truyền cả email và name vào hàm openWidgetChat

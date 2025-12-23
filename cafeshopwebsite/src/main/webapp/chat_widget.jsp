@@ -29,10 +29,10 @@
 
             <div id="staffChatDetailView" class="h-100 flex-column bg-light d-none">
                 <div class="bg-white text-dark p-2 d-flex align-items-center border-bottom shadow-sm">
-                    <button class="btn btn-sm btn-light me-2 rounded-circle border" onclick="backToUserList()">
-                        <i class="fa-solid fa-arrow-left text-success"></i>
+                    <button class="btn-sm border-0 me-2" onclick="backToUserList()">
+                        <i class="fa-solid fa-arrow-left text-dark fs-5"></i>
                     </button>
-                    <div class="fw-bold text-success text-truncate" id="staffChattingWithName">Khách hàng</div>
+                    <div class="fw-bold text-dark text-truncate fs-6" id="staffChattingWithName">Khách hàng</div>
                 </div>
                 <div class="flex-grow-1 overflow-auto p-3" id="staffChatContent"></div>
                 <div class="p-2 bg-white border-top">
