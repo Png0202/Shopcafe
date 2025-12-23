@@ -319,6 +319,50 @@ public class StaffServlet extends HttpServlet {
                 }
                 response.sendRedirect("staff?tab=menu&status=updated");
             }
+            // --- THÊM BÀN MỚI (MỚI) ---
+            else if ("add_table".equals(action)) {
+                String tableName = request.getParameter("tableName");
+                
+                // Mặc định thêm bàn với trạng thái 0 (Trống)
+                String sql = "INSERT INTO tables (name, status) VALUES (?, 0)";
+                
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ps.setString(1, tableName);
+                ps.executeUpdate();
+                
+                // Quay lại tab POS
+                response.sendRedirect("staff?tab=pos&status=success");
+            }
+            // --- SỬA TÊN BÀN ---
+            else if ("edit_table".equals(action)) {
+                int id = Integer.parseInt(request.getParameter("tableId"));
+                String name = request.getParameter("tableName");
+                
+                String sql = "UPDATE tables SET name = ? WHERE id = ?";
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ps.setString(1, name);
+                ps.setInt(2, id);
+                ps.executeUpdate();
+                
+                response.sendRedirect("staff?tab=pos&status=updated");
+            }
+            // --- XÓA BÀN ---
+            else if ("delete_table".equals(action)) {
+                int id = Integer.parseInt(request.getParameter("tableId"));
+                
+                // Xóa giỏ hàng liên quan trước (nếu có rác)
+                PreparedStatement psCart = conn.prepareStatement("DELETE FROM cart_items WHERE table_id = ?");
+                psCart.setInt(1, id);
+                psCart.executeUpdate();
+                
+                // Sau đó xóa bàn
+                String sql = "DELETE FROM tables WHERE id = ?";
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ps.setInt(1, id);
+                ps.executeUpdate();
+                
+                response.sendRedirect("staff?tab=pos&status=deleted");
+            }
 
         } catch (Exception e) {
             e.printStackTrace();

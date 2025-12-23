@@ -303,5 +303,6 @@
                 }, 500);
             }
         </script>
+        <jsp:include page="chat_widget.jsp" />
     </body>
     </html>

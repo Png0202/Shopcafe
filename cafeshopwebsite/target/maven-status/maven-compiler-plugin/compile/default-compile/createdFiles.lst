@@ -11,6 +11,7 @@ com\cafe\model\UserAddress.class
 com\cafe\controller\OrderDetailServlet.class
 com\cafe\model\User.class
 com\cafe\util\EmailUtility.class
+com\cafe\controller\ChatServlet.class
 com\cafe\controller\LoginGoogleServlet.class
 com\cafe\model\Product.class
 com\cafe\controller\HomeServlet.class

@@ -268,5 +268,6 @@
             if (addrSelect) { previewAddress(addrSelect); }
         });
     </script>
+    <jsp:include page="chat_widget.jsp" />
 </body>
 </html>

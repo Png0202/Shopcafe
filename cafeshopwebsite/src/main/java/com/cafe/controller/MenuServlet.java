@@ -47,34 +47,44 @@ public class MenuServlet extends HttpServlet {
                     hasData = true;
                     int id = rs.getInt("id");
                     String name = rs.getString("name");
-                    String desc = rs.getString("description");
                     double price = rs.getDouble("price");
                     String category = rs.getString("category");
                     String img = rs.getString("image_url");
+                    int status = rs.getInt("status"); 
                     
                     // Mapping category để bộ lọc JS hoạt động
                     String dataCat = "cake";
                     if("Cà Phê".equals(category)) dataCat = "coffee";
                     else if("Trà".equals(category)) dataCat = "tea";
 
-                    // Tạo HTML Card sản phẩm chuẩn Bootstrap (Copy cấu trúc từ JSP)
+                    // Tạo HTML Card sản phẩm 
                     html.append("<div class='col product-col animate__animated animate__fadeIn' data-category='").append(dataCat).append("'>");
                     html.append("  <div class='card h-100 product-card shadow-sm'>");
+                    
+                    // Hình ảnh
                     html.append("    <div class='product-img-wrapper'>");
                     html.append("      <img src='").append(img).append("' class='card-img-top' alt='").append(name).append("' onerror=\"this.src='https://placehold.co/400x200?text=").append(name).append("'\">");
                     html.append("    </div>");
+                    
+                    // Body Card
                     html.append("    <div class='card-body d-flex flex-column text-center'>");
                     html.append("      <h5 class='card-title fw-bold' style='color: #333;'>").append(name).append("</h5>");
-                    html.append("      <p class='card-text text-muted small flex-grow-1 text-truncate-2'>").append(desc).append("</p>");
                     html.append("      <div class='mt-3'>");
                     html.append("        <div class='price-tag mb-3'>").append(String.format("%,.0f", price)).append(" ₫</div>");
                     
-                    // Form thêm vào giỏ
-                    html.append("        <form action='cart' method='post'>");
-                    html.append("          <input type='hidden' name='action' value='add'>");
-                    html.append("          <input type='hidden' name='productId' value='").append(id).append("'>");
-                    html.append("          <button type='submit' class='btn btn-add-cart w-100 py-2'><i class='fa-solid fa-cart-plus me-2'></i>Thêm Vào Giỏ</button>");
-                    html.append("        </form>");
+                    // --- LOGIC KIỂM TRA TRẠNG THÁI ---
+                    if (status == 1) {
+                        // Nếu ĐANG BÁN -> Hiện nút Thêm vào giỏ
+                        html.append("        <a href='add-to-cart?id=").append(id).append("' class='btn btn-warning fw-bold w-100'>");
+                        html.append("          <i class='fa-solid fa-cart-plus'></i> Thêm vào giỏ");
+                        html.append("        </a>");
+                    } else {
+                        // Nếu TẠM HẾT -> Hiện nút Xám (Disabled)
+                        html.append("        <button class='btn btn-secondary fw-bold w-100' disabled style='cursor: not-allowed;'>");
+                        html.append("          <i class='fa-solid fa-circle-xmark'></i> Tạm hết");
+                        html.append("        </button>");
+                    }
+                    // --------------------------------------------------------
                     
                     html.append("      </div>"); 
                     html.append("    </div>");   

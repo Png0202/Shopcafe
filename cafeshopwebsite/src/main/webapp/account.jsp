@@ -726,5 +726,6 @@
         const params = new URLSearchParams(window.location.search);
         if(params.get('tab')) showTab(params.get('tab'));
     </script>
+    <jsp:include page="chat_widget.jsp" />
 </body>
 </html>

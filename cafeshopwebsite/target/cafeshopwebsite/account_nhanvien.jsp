@@ -153,13 +153,37 @@
     <div class="container mt-4 mb-5 flex-grow-1">
         
         <div id="tab-pos" class="tab-content-section active">
-            <h4 class="border-start border-5 border-warning ps-3 mb-4 text-uppercase fw-bold text-dark">Sơ Đồ Bàn</h4>
+            <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+                <h4 class="border-start border-5 border-warning ps-3 text-uppercase fw-bold text-dark m-0">Sơ Đồ Bàn</h4>
+                <button class="btn btn-warning fw-bold text-white btn-add-mobile" data-bs-toggle="modal" data-bs-target="#addTableModal">
+                    <i class="fa-solid fa-plus me-2"></i>Thêm Bàn
+                </button>
+            </div>
             
             <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-4">
                 <c:forEach var="t" items="${tables}">
                     <div class="col">
-                        <div class="card table-card shadow-sm py-4 ${t.status == 0 ? 'bg-table-empty' : 'bg-table-busy'}" 
+                        <div class="card table-card shadow-sm py-4 position-relative ${t.status == 0 ? 'bg-table-empty' : 'bg-table-busy'}" 
                              onclick="handleTableClick('${t.id}', '${t.name}', ${t.status})">
+
+                            <div class="position-absolute top-0 end-0 p-2" onclick="event.stopPropagation()">
+                                <%-- Nút Sửa --%>
+                                <button class="btn btn-sm btn-success border-0 shadow-sm me-1" 
+                                        style="width: 30px; height: 30px; border-radius: 50%; padding: 0;"
+                                        onclick="openEditTableModal('${t.id}', '${t.name}')" title="Sửa tên bàn">
+                                    <i class="fa-solid fa-pen text-white" style="font-size: 12px;"></i>
+                                </button>
+                                
+                                <%-- Nút Xóa (Chỉ hiện khi bàn Trống để tránh lỗi) --%>
+                                <c:if test="${t.status == 0}">
+                                    <button class="btn btn-sm btn-light text-danger border-0 shadow-sm" 
+                                            style="width: 30px; height: 30px; border-radius: 50%; padding: 0;"
+                                            onclick="openDeleteTableModal('${t.id}', '${t.name}')" title="Xóa bàn này">
+                                        <i class="fa-solid fa-trash text-white" style="font-size: 12px;"></i>
+                                    </button>
+                                </c:if>
+                            </div>
+
                             <div class="card-body">
                                 <h4 class="mb-2"><i class="fa-solid fa-utensils me-2"></i>${t.name}</h4>
                                 <span class="badge bg-light text-dark rounded-pill px-3">${t.status == 0 ? 'TRỐNG' : 'CÓ KHÁCH'}</span>
@@ -534,6 +558,77 @@
         <input type="hidden" name="id" id="inputDeleteProductId">
     </form>
 
+    <div class="modal fade" id="addTableModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-white">
+                    <h5 class="modal-title fw-bold"><i class="fa-solid fa-chair me-2"></i>Thêm Bàn Mới</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="staff" method="post">
+                        <input type="hidden" name="action" value="add_table">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Tên bàn</label>
+                            <input type="text" name="tableName" class="form-control" placeholder="Ví dụ: Bàn 10, Bàn VIP..." required>
+                        </div>
+                        <button type="submit" class="btn btn-warning text-white w-100 fw-bold">
+                            <i class="fa-solid fa-floppy-disk me-2"></i>LƯU BÀN
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="editTableModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fw-bold"><i class="fa-solid fa-pen-to-square me-2"></i>Đổi Tên Bàn</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="staff" method="post">
+                        <input type="hidden" name="action" value="edit_table">
+                        <input type="hidden" name="tableId" id="inputEditTableId">
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Tên bàn mới</label>
+                            <input type="text" name="tableName" id="inputEditTableName" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 fw-bold">LƯU THAY ĐỔI</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteTableModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title fw-bold"><i class="fa-solid fa-trash me-2"></i>Xóa Bàn</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <i class="fa-solid fa-circle-exclamation text-danger fa-3x mb-3"></i>
+                    <p>Bạn có chắc chắn muốn xóa <strong id="deleteTableNameDisplay"></strong>?</p>
+                    <p class="small text-muted">Hành động này không thể hoàn tác.</p>
+                    
+                    <form action="staff" method="post">
+                        <input type="hidden" name="action" value="delete_table">
+                        <input type="hidden" name="tableId" id="inputDeleteTableId">
+                        <div class="d-flex gap-2 justify-content-center mt-4">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="submit" class="btn btn-danger fw-bold">Xóa Ngay</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
@@ -749,6 +844,22 @@
             // Submit form ẩn
             document.getElementById('deleteProductForm').submit();
         }
+        // --- QUẢN LÝ BÀN (SỬA / XÓA) ---
+        const editTableModal = new bootstrap.Modal(document.getElementById('editTableModal'));
+        const deleteTableModal = new bootstrap.Modal(document.getElementById('deleteTableModal'));
+
+        function openEditTableModal(id, name) {
+            document.getElementById('inputEditTableId').value = id;
+            document.getElementById('inputEditTableName').value = name;
+            editTableModal.show();
+        }
+
+        function openDeleteTableModal(id, name) {
+            document.getElementById('inputDeleteTableId').value = id;
+            document.getElementById('deleteTableNameDisplay').innerText = name;
+            deleteTableModal.show();
+        }
     </script>
+    <jsp:include page="chat_widget.jsp" />
 </body>
 </html>
