@@ -47,7 +47,7 @@
         <%-- ================= TRƯỜNG HỢP 2: GIAO DIỆN KHÁCH HÀNG ================= --%>
         <c:if test="${sessionScope.permission != 1}">
             <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                <h6 class="m-0 fw-bold"><i class="fa-solid fa-headset me-2"></i>Chat Với Quán</h6>
+                <h6 class="m-0 fw-bold"><i class="fa-solid fa-headset me-2"></i>CSKH</h6>
                 <button type="button" class="btn-close btn-close-white" onclick="toggleGlobalChat()"></button>
             </div>
             <div class="card-body bg-light overflow-auto flex-grow-1" id="customerChatContent">
@@ -55,8 +55,8 @@
             </div>
             <div class="card-footer bg-white p-2">
                 <div class="input-group">
-                    <input type="text" id="customerChatInput" class="form-control border-0" placeholder="Nhập tin nhắn..." onkeypress="handleCustomerEnter(event)">
-                    <button class="btn btn-primary rounded-circle ms-2" onclick="sendCustomerMsgWidget()">
+                    <input type="text" id="customerChatInput" class="form-control" placeholder="Nhập tin nhắn..." onkeypress="handleCustomerEnter(event)">
+                    <button class="btn btn-primary ms-2" onclick="sendCustomerMsgWidget()">
                         <i class="fa-solid fa-paper-plane"></i>
                     </button>
                 </div>

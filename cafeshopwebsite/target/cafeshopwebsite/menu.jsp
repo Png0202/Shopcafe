@@ -217,12 +217,11 @@
                                             <input type="hidden" name="action" value="add">
                                             <input type="hidden" name="productId" value="${product.id}">
                                             <c:choose>
-                                            <%-- Nếu trạng thái là 1 (Đang bán) -> Hiện nút Mua bình thường --%>
-                                            <c:when test="${product.status == 1}">
-                                                <a href="${pageContext.request.contextPath}/cart?id=${product.id}" class="btn btn-warning fw-bold">
-                                                    <i class="fa-solid fa-cart-plus"></i> Thêm vào giỏ
-                                                </a>
-                                            </c:when>
+                                                <c:when test="${product.status == 1}">
+                                                    <button type="submit" class="btn btn-warning fw-bold w-100">
+                                                        <i class="fa-solid fa-cart-plus"></i> Thêm vào giỏ
+                                                    </button>
+                                                </c:when>
                                             
                                             <%-- Nếu trạng thái là 0 (Tạm hết) -> Hiện nút Xám và không bấm được --%>
                                             <c:otherwise>
