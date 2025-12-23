@@ -219,7 +219,7 @@
                                             <c:choose>
                                             <%-- Nếu trạng thái là 1 (Đang bán) -> Hiện nút Mua bình thường --%>
                                             <c:when test="${product.status == 1}">
-                                                <a href="add-to-cart?id=${product.id}" class="btn btn-warning fw-bold">
+                                                <a href="${pageContext.request.contextPath}/cart?id=${product.id}" class="btn btn-warning fw-bold">
                                                     <i class="fa-solid fa-cart-plus"></i> Thêm vào giỏ
                                                 </a>
                                             </c:when>
