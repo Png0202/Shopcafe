@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
+import java.util.TimeZone; // Import thêm TimeZone
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -91,7 +92,11 @@ public class ChatServlet extends HttpServlet {
 
                 ResultSet rs = ps.executeQuery();
                 StringBuilder html = new StringBuilder();
+                
+                // Thiết lập định dạng ngày giờ theo múi giờ Việt Nam (GMT+7)
                 SimpleDateFormat sdf = new SimpleDateFormat("HH:mm dd/MM");
+                sdf.setTimeZone(TimeZone.getTimeZone("GMT+7")); 
+                // -------------------------------------------------------------------
 
                 while (rs.next()) {
                     String sender = rs.getString("sender_email");
@@ -114,9 +119,8 @@ public class ChatServlet extends HttpServlet {
             // --- LOAD DANH SÁCH KHÁCH HÀNG (CHO NHÂN VIÊN) ---
             else if ("get_users".equals(action)) {
                 // SQL Logic:
-                // 1. Lấy tất cả user không phải admin/nhân viên (permissions NOT IN (0, 1))
-                // 2. JOIN với bảng messages để lấy thời gian tin nhắn cuối và đếm tin chưa đọc
-                // 3. Sắp xếp: Tin chưa đọc lên đầu > Tin mới nhất > Tên A-Z
+                // 1. Lấy tất cả user không phải admin/nhân viên
+                // 2. Sắp xếp: Tin chưa đọc lên đầu > Tin mới nhất > Tên A-Z
                 String sql = "SELECT u.email, u.name, " +
                              "MAX(m.created_at) as last_msg_time, " +
                              "SUM(CASE WHEN m.role = 'user' AND m.is_read = 0 THEN 1 ELSE 0 END) as unread_count " +
@@ -130,18 +134,15 @@ public class ChatServlet extends HttpServlet {
                 ResultSet rs = ps.executeQuery();
                 
                 StringBuilder html = new StringBuilder();
-                boolean hasUnreadGlobal = false; // Cờ kiểm tra xem có tin nhắn chưa đọc nào không
-
+                
                 while(rs.next()){
                     String email = rs.getString("email");
                     String name = rs.getString("name");
                     int unread = rs.getInt("unread_count");
                     
                     if (name == null || name.isEmpty()) name = email; // Fallback nếu chưa có tên
-                    if (unread > 0) hasUnreadGlobal = true;
 
-                    // Highlight nền nếu có tin chưa đọc
-                    String bgClass = (unread > 0) ? "bg-light" : "";
+                    String bgClass = (unread > 0) ? "bg-light" : ""; 
                     String fwClass = (unread > 0) ? "fw-bold text-dark" : "text-secondary";
 
                     // Truyền cả email và name vào hàm openWidgetChat
@@ -154,7 +155,7 @@ public class ChatServlet extends HttpServlet {
                     html.append("      <small class='text-muted' style='font-size: 11px;'>").append(email).append("</small>");
                     html.append("    </div>");
                     
-                    // Hiển thị chấm đỏ số lượng
+                    // Vẫn giữ lại badge đỏ tròn đếm số
                     if (unread > 0) {
                         html.append("    <span class='badge bg-danger rounded-pill ms-2'>").append(unread).append("</span>");
                         html.append("    "); // Cờ để JS nhận biết bật chấm đỏ ngoài widget
