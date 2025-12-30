@@ -154,11 +154,15 @@ public class StaffServlet extends HttpServlet {
             while(rsTable.next()) tables.add(new Table(rsTable.getInt("id"), rsTable.getString("name"), rsTable.getInt("status")));
             request.setAttribute("tables", tables);
 
-            // B. Load Đơn Online
+            // B. Load Đơn Online (Chia làm 2 danh sách)
             List<Order> onlineOrders = new ArrayList<>();
+            List<Order> cancelledOrders = new ArrayList<>(); // Danh sách cho đơn hủy
+            
+            // Query lấy TẤT CẢ đơn online
             String sqlOrder = "SELECT o.*, u.name AS user_name FROM orders o JOIN users u ON o.user_email = u.email WHERE o.order_type = 'online' ORDER BY o.order_date DESC";
             PreparedStatement psOrder = conn.prepareStatement(sqlOrder);
             ResultSet rsOrder = psOrder.executeQuery();
+            
             while (rsOrder.next()) {
                 Order order = new Order();
                 order.setId(rsOrder.getInt("id"));
@@ -169,9 +173,16 @@ public class StaffServlet extends HttpServlet {
                 order.setAddress(rsOrder.getString("address"));
                 order.setPaymentMethod(rsOrder.getString("payment_method"));
                 order.setNote(rsOrder.getString("note"));
-                onlineOrders.add(order);
+                
+                // Phân loại đơn hàng
+                if ("Đã hủy".equals(order.getStatus())) {
+                    cancelledOrders.add(order);
+                } else {
+                    onlineOrders.add(order);
+                }
             }
             request.setAttribute("onlineOrders", onlineOrders);
+            request.setAttribute("cancelledOrders", cancelledOrders); 
 
             // C. LOAD DANH SÁCH SẢN PHẨM (QUAN TRỌNG: ĐỂ TAB MENU HIỆN DỮ LIỆU)
             List<Product> productList = new ArrayList<>();
